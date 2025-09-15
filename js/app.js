@@ -1020,9 +1020,22 @@ class PoliceEvent {
   }
 
   /**
-   * Generate enhanced popup content with better structure and information
+   * Generate enhanced popup content using the new EnhancedEventPopup system
    */
   getPopupContent() {
+    // Check if EnhancedEventPopup is available, fallback to basic popup if not
+    if (typeof EnhancedEventPopup !== 'undefined') {
+      return EnhancedEventPopup.generatePopupContent(this);
+    }
+
+    // Fallback to basic popup for backwards compatibility
+    return this.getBasicPopupContent();
+  }
+
+  /**
+   * Basic popup content (fallback)
+   */
+  getBasicPopupContent() {
     const severityColor = this.severityInfo.color;
     const priorityEmojis = {
       low: '🟢',
