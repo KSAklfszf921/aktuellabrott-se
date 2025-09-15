@@ -1,24 +1,22 @@
+// Professional Service Worker for Police Events Map
+// Provides offline functionality, caching, and performance optimization
+
 'use strict';
 
-/**
- * Service Worker for Aktuella Brott - Professional Police Events Map
- * Provides offline functionality, caching, and performance optimization
- */
-
-const CACHE_NAME = 'aktuella-brott-v1.0';
-const DATA_CACHE_NAME = 'aktuella-brott-data-v1.0';
+const CACHE_NAME = 'police-events-professional-v1.2';
+const DATA_CACHE_NAME = 'police-events-data-v1.2';
 
 // Static assets to cache
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/app.js',
+  '/police-events-map-professional.html',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css',
-  'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'
+  'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js',
+  'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js',
+  'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
 // API endpoints that should use network-first strategy
@@ -30,7 +28,7 @@ const API_ENDPOINTS = [
 // Cache duration for different types of content (in milliseconds)
 const CACHE_DURATION = {
   STATIC: 7 * 24 * 60 * 60 * 1000,      // 7 days
-  API_DATA: 2 * 60 * 60 * 1000,         // 2 hours
+  API_DATA: 30 * 60 * 1000,             // 30 minutes
   RSS_FEED: 60 * 60 * 1000              // 1 hour
 };
 
@@ -121,7 +119,18 @@ async function networkFirstStrategy(request) {
         cache.put(request, responseClone);
       });
 
-      return networkResponse;
+      // Add cache metadata headers
+      const response = new Response(networkResponse.body, {
+        status: networkResponse.status,
+        statusText: networkResponse.statusText,
+        headers: {
+          ...Object.fromEntries(networkResponse.headers),
+          'sw-cache-status': 'network-fresh',
+          'sw-cache-timestamp': Date.now().toString()
+        }
+      });
+
+      return response;
     }
 
     throw new Error(`Network response not ok: ${networkResponse.status}`);
@@ -134,7 +143,21 @@ async function networkFirstStrategy(request) {
     const cachedResponse = await cache.match(request);
 
     if (cachedResponse) {
-      return cachedResponse;
+      // Check if cached response is still valid
+      const cacheTimestamp = parseInt(cachedResponse.headers.get('sw-cache-timestamp') || '0');
+      const age = Date.now() - cacheTimestamp;
+
+      // Add cache status header
+      const response = new Response(cachedResponse.body, {
+        status: cachedResponse.status,
+        statusText: cachedResponse.statusText,
+        headers: {
+          ...Object.fromEntries(cachedResponse.headers),
+          'sw-cache-status': age > CACHE_DURATION.API_DATA ? 'cache-stale' : 'cache-fresh'
+        }
+      });
+
+      return response;
     }
 
     // No cache available, return offline fallback
@@ -151,7 +174,23 @@ async function cacheFirstStrategy(request) {
     const cachedResponse = await cache.match(request);
 
     if (cachedResponse) {
-      return cachedResponse;
+      // Check cache age for static assets
+      const cacheTimestamp = parseInt(cachedResponse.headers.get('sw-cache-timestamp') || '0');
+      const age = Date.now() - cacheTimestamp;
+
+      // If cache is fresh or we're offline, return cached version
+      if (age < CACHE_DURATION.STATIC || !navigator.onLine) {
+        const response = new Response(cachedResponse.body, {
+          status: cachedResponse.status,
+          statusText: cachedResponse.statusText,
+          headers: {
+            ...Object.fromEntries(cachedResponse.headers),
+            'sw-cache-status': 'cache-hit'
+          }
+        });
+
+        return response;
+      }
     }
 
     // Try network for fresh content
@@ -160,8 +199,40 @@ async function cacheFirstStrategy(request) {
     if (networkResponse && networkResponse.status === 200) {
       // Cache the fresh response
       const responseClone = networkResponse.clone();
-      cache.put(request, responseClone);
-      return networkResponse;
+
+      cache.put(request, new Response(responseClone.body, {
+        status: responseClone.status,
+        statusText: responseClone.statusText,
+        headers: {
+          ...Object.fromEntries(responseClone.headers),
+          'sw-cache-timestamp': Date.now().toString()
+        }
+      }));
+
+      const response = new Response(networkResponse.body, {
+        status: networkResponse.status,
+        statusText: networkResponse.statusText,
+        headers: {
+          ...Object.fromEntries(networkResponse.headers),
+          'sw-cache-status': 'network-fresh'
+        }
+      });
+
+      return response;
+    }
+
+    // Network failed, return cached version if available
+    if (cachedResponse) {
+      const response = new Response(cachedResponse.body, {
+        status: cachedResponse.status,
+        statusText: cachedResponse.statusText,
+        headers: {
+          ...Object.fromEntries(cachedResponse.headers),
+          'sw-cache-status': 'cache-fallback'
+        }
+      });
+
+      return response;
     }
 
     throw new Error('No cached response available');
@@ -182,7 +253,8 @@ function createOfflineFallback(request) {
       status: 200,
       statusText: 'OK (Offline)',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'sw-cache-status': 'offline-fallback'
       }
     });
   }
@@ -193,7 +265,8 @@ function createOfflineFallback(request) {
       status: 200,
       statusText: 'OK (Offline)',
       headers: {
-        'Content-Type': 'text/html'
+        'Content-Type': 'text/html',
+        'sw-cache-status': 'offline-fallback'
       }
     });
   }
@@ -201,7 +274,10 @@ function createOfflineFallback(request) {
   // For other requests, return appropriate error
   return new Response('Offline - Innehåll ej tillgängligt', {
     status: 503,
-    statusText: 'Service Unavailable (Offline)'
+    statusText: 'Service Unavailable (Offline)',
+    headers: {
+      'sw-cache-status': 'offline-fallback'
+    }
   });
 }
 
@@ -213,7 +289,7 @@ function createOfflineHTML() {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Offline - Aktuella Brott</title>
+      <title>Offline - Polishändelser Sverige</title>
       <style>
         body {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -272,9 +348,9 @@ function createOfflineHTML() {
     </head>
     <body>
       <div class="offline-container">
-        <div class="offline-icon">🚫</div>
+        <div class="offline-icon">📡</div>
         <h1>Du är offline</h1>
-        <p>Aktuella Brott kräver internetuppkoppling för att visa aktuell data. Kontrollera din anslutning och försök igen.</p>
+        <p>Polishändelser-kartan kräver internetuppkoppling för att visa aktuell data. Kontrollera din anslutning och försök igen.</p>
         <button class="retry-btn" onclick="window.location.reload()">
           Försök igen
         </button>
@@ -312,6 +388,75 @@ function createOfflineHTML() {
   `;
 }
 
+// Handle messages from main thread
+self.addEventListener('message', event => {
+  const { type, payload } = event.data;
+
+  switch (type) {
+    case 'CACHE_STATS':
+      getCacheStats().then(stats => {
+        event.ports[0].postMessage({ type: 'CACHE_STATS_RESPONSE', payload: stats });
+      });
+      break;
+
+    case 'CLEAR_CACHE':
+      clearAllCaches().then(success => {
+        event.ports[0].postMessage({ type: 'CLEAR_CACHE_RESPONSE', payload: { success } });
+      });
+      break;
+
+    case 'SKIP_WAITING':
+      self.skipWaiting();
+      break;
+
+    default:
+      console.warn('[ServiceWorker] Unknown message type:', type);
+  }
+});
+
+// Get cache statistics
+async function getCacheStats() {
+  try {
+    const [staticCache, dataCache] = await Promise.all([
+      caches.open(CACHE_NAME),
+      caches.open(DATA_CACHE_NAME)
+    ]);
+
+    const [staticKeys, dataKeys] = await Promise.all([
+      staticCache.keys(),
+      dataCache.keys()
+    ]);
+
+    return {
+      staticAssets: staticKeys.length,
+      cachedData: dataKeys.length,
+      totalCaches: staticKeys.length + dataKeys.length,
+      cacheNames: [CACHE_NAME, DATA_CACHE_NAME]
+    };
+
+  } catch (error) {
+    console.error('[ServiceWorker] Error getting cache stats:', error);
+    return { error: error.message };
+  }
+}
+
+// Clear all caches
+async function clearAllCaches() {
+  try {
+    const cacheNames = await caches.keys();
+    await Promise.all(
+      cacheNames.map(cacheName => caches.delete(cacheName))
+    );
+
+    console.log('[ServiceWorker] All caches cleared');
+    return true;
+
+  } catch (error) {
+    console.error('[ServiceWorker] Error clearing caches:', error);
+    return false;
+  }
+}
+
 // Background sync for failed API requests (if supported)
 if ('sync' in self.registration) {
   self.addEventListener('sync', event => {
@@ -342,7 +487,16 @@ async function syncPoliceData() {
     try {
       const response = await fetch(url);
       if (response.ok) {
-        await cache.put(url, response.clone());
+        const responseWithTimestamp = new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: {
+            ...Object.fromEntries(response.headers),
+            'sw-cache-timestamp': Date.now().toString()
+          }
+        });
+
+        await cache.put(url, responseWithTimestamp);
         console.log(`[ServiceWorker] Synced ${url}`);
       }
     } catch (error) {
@@ -351,4 +505,40 @@ async function syncPoliceData() {
   }
 }
 
-console.log('[ServiceWorker] Aktuella Brott Service Worker loaded');
+// Periodic cache cleanup (every 24 hours)
+setInterval(() => {
+  cleanupExpiredCaches()
+    .then(() => {
+      console.log('[ServiceWorker] Cache cleanup completed');
+    })
+    .catch(error => {
+      console.error('[ServiceWorker] Cache cleanup failed:', error);
+    });
+}, 24 * 60 * 60 * 1000);
+
+async function cleanupExpiredCaches() {
+  const cache = await caches.open(DATA_CACHE_NAME);
+  const requests = await cache.keys();
+
+  const now = Date.now();
+  let cleanedCount = 0;
+
+  for (const request of requests) {
+    const response = await cache.match(request);
+    if (response) {
+      const timestamp = parseInt(response.headers.get('sw-cache-timestamp') || '0');
+      const age = now - timestamp;
+
+      // Remove if older than 7 days
+      if (age > 7 * 24 * 60 * 60 * 1000) {
+        await cache.delete(request);
+        cleanedCount++;
+      }
+    }
+  }
+
+  console.log(`[ServiceWorker] Cleaned ${cleanedCount} expired cache entries`);
+  return cleanedCount;
+}
+
+console.log('[ServiceWorker] Professional Police Events Service Worker loaded');

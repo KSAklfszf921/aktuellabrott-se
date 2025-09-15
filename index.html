@@ -3,53 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Aktuella Brott - Interaktiv realtidskarta över polishändelser i Sverige med data från Polisen" />
-  <meta name="keywords" content="polishändelser, brott, Sverige, karta, realtid, polisen, säkerhet" />
-  <meta name="author" content="Aktuella Brott" />
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://aktuellabrott.se/" />
-  <meta property="og:title" content="Aktuella Brott - Polishändelser i Sverige" />
-  <meta property="og:description" content="Interaktiv realtidskarta över polishändelser i Sverige med officiell data från Polisen" />
-  <meta property="og:image" content="https://aktuellabrott.se/assets/og-image.png" />
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="https://aktuellabrott.se/" />
-  <meta property="twitter:title" content="Aktuella Brott - Polishändelser i Sverige" />
-  <meta property="twitter:description" content="Interaktiv realtidskarta över polishändelser i Sverige" />
-  <meta property="twitter:image" content="https://aktuellabrott.se/assets/og-image.png" />
-
-  <title>Aktuella Brott - Polishändelser i Sverige</title>
-
-  <!-- Favicons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
-  <link rel="manifest" href="/assets/site.webmanifest">
+  <meta name="description" content="Interaktiv karta över polishändelser i Sverige - Realtidsdata från Polisen" />
+  <title>Polishändelser Sverige - Interaktiv Realtidskarta</title>
 
   <!-- External Dependencies -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
   <style>
-    /* Enhanced CSS Variables - Professional Government Theme */
+    /* Modern CSS Variables - Light Professional Theme */
     :root {
-      --color-primary: #1e3a8a;
-      --color-primary-light: #3b82f6;
-      --color-primary-dark: #1e40af;
-      --color-secondary: #6b7280;
-      --color-secondary-light: #9ca3af;
-      --color-accent: #059669;
-      --color-warning: #d97706;
-      --color-error: #dc2626;
-      --color-success: #059669;
+      --color-primary: #475569;
+      --color-primary-light: #64748b;
+      --color-primary-dark: #334155;
+      --color-secondary: #78716c;
+      --color-secondary-light: #a8a29e;
+      --color-accent: #6b7280;
+      --color-warning: #a16207;
+      --color-error: #991b1b;
+      --color-success: #15803d;
 
       --bg-primary: #ffffff;
       --bg-secondary: #f8fafc;
@@ -71,7 +44,7 @@
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
       --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
-      --radius-sm: 6px;
+      --radius-sm: 4px;
       --radius-md: 8px;
       --radius-lg: 12px;
       --radius-xl: 16px;
@@ -82,9 +55,9 @@
       --spacing-lg: 24px;
       --spacing-xl: 32px;
 
-      --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-fast: 0.15s ease-out;
+      --transition-normal: 0.25s ease-out;
+      --transition-slow: 0.4s ease-out;
     }
 
     /* Reset & Base Styles */
@@ -102,7 +75,6 @@
       font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      scroll-behavior: smooth;
     }
 
     /* Layout */
@@ -111,19 +83,18 @@
       grid-template-rows: auto 1fr;
       height: 100vh;
       position: relative;
-      overflow: hidden;
     }
 
-    /* Enhanced Header */
-    .header {
-      background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-      color: var(--text-inverse);
-      padding: var(--spacing-lg) var(--spacing-xl);
+    /* Header */
+    header {
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+      padding: var(--spacing-md) var(--spacing-lg);
       position: sticky;
       top: 0;
       z-index: 1000;
-      backdrop-filter: blur(20px);
-      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(10px);
     }
 
     .header-content {
@@ -131,36 +102,25 @@
       margin: 0 auto;
     }
 
-    .header-top {
+    .header-title {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: var(--spacing-md);
     }
 
-    .logo-section {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-    }
-
-    .logo {
-      font-size: 2rem;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    }
-
-    .brand-info h1 {
-      font-size: 1.75rem;
+    h1 {
+      font-size: 1.5rem;
       font-weight: 700;
-      margin: 0 0 var(--spacing-xs);
+      color: var(--text-primary);
+      margin: 0;
       letter-spacing: -0.025em;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
-    .brand-info .tagline {
-      font-size: 0.95rem;
-      opacity: 0.9;
-      margin: 0;
+    .header-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0 0 var(--spacing-md);
       font-weight: 400;
     }
 
@@ -168,20 +128,17 @@
       display: flex;
       align-items: center;
       gap: var(--spacing-xs);
-      background: rgba(255, 255, 255, 0.15);
-      padding: var(--spacing-sm) var(--spacing-md);
-      border-radius: var(--radius-lg);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 0.75rem;
+      color: var(--color-success);
+      font-weight: 500;
     }
 
     .status-dot {
-      width: 10px;
-      height: 10px;
-      background: #22c55e;
+      width: 8px;
+      height: 8px;
+      background: var(--color-success);
       border-radius: 50%;
       animation: pulse 2s infinite;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
     }
 
     @keyframes pulse {
@@ -189,45 +146,38 @@
       50% { opacity: 0.5; }
     }
 
-    .status-text {
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-
-    /* Enhanced Controls Grid */
+    /* Controls Grid */
     .controls {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: var(--spacing-md);
       align-items: start;
     }
 
     .control-group {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
       border-radius: var(--radius-md);
       padding: var(--spacing-md);
-      backdrop-filter: blur(10px);
-      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition-fast);
     }
 
     .control-group:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
     }
 
     .control-label {
       display: block;
       font-size: 0.75rem;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.8);
+      color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: var(--spacing-xs);
     }
 
-    /* Enhanced Form Elements */
+    /* Form Elements */
     input, select, button {
       font-family: inherit;
       font-size: 0.875rem;
@@ -237,28 +187,22 @@
     input[type="number"],
     select {
       width: 100%;
-      padding: 12px 14px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 10px 12px;
+      border: 1px solid var(--border-medium);
       border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-inverse);
+      background: var(--bg-primary);
+      color: var(--text-primary);
       transition: all var(--transition-fast);
       outline: none;
-      backdrop-filter: blur(10px);
-    }
-
-    input::placeholder {
-      color: rgba(255, 255, 255, 0.6);
     }
 
     input:focus,
     select:focus {
-      border-color: rgba(255, 255, 255, 0.6);
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+      border-color: var(--color-primary-light);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
-    /* Enhanced Buttons */
+    /* Buttons */
     .button-group {
       display: flex;
       gap: var(--spacing-sm);
@@ -270,7 +214,7 @@
       align-items: center;
       justify-content: center;
       gap: var(--spacing-xs);
-      padding: 12px 18px;
+      padding: 10px 16px;
       border: 1px solid transparent;
       border-radius: var(--radius-sm);
       font-weight: 500;
@@ -280,39 +224,36 @@
       position: relative;
       overflow: hidden;
       white-space: nowrap;
-      min-height: 44px;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #22c55e 0%, #059669 100%);
+      background: var(--color-primary);
       color: var(--text-inverse);
-      border-color: #059669;
-      box-shadow: var(--shadow-sm);
+      border-color: var(--color-primary);
     }
 
     .btn-primary:hover {
-      background: linear-gradient(135deg, #16a34a 0%, #047857 100%);
+      background: var(--color-primary-dark);
       transform: translateY(-1px);
       box-shadow: var(--shadow-md);
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-inverse);
-      border-color: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(10px);
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border-color: var(--border-medium);
     }
 
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.4);
-      transform: translateY(-1px);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-color: var(--border-dark);
     }
 
     .btn-secondary.active {
-      background: rgba(255, 255, 255, 0.25);
-      border-color: rgba(255, 255, 255, 0.5);
-      box-shadow: var(--shadow-sm);
+      background: var(--color-primary);
+      color: var(--text-inverse);
+      border-color: var(--color-primary);
     }
 
     /* Map Container */
@@ -321,129 +262,113 @@
       height: 100%;
       position: relative;
       z-index: 1;
-      border-top: 1px solid var(--border-light);
     }
 
-    /* Enhanced Floating UI Elements */
+    /* Floating UI Elements */
     .floating-panel {
       position: absolute;
       background: var(--bg-overlay);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(10px);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-xl);
+      box-shadow: var(--shadow-lg);
       z-index: 500;
       transition: all var(--transition-normal);
-      max-height: 80vh;
-      overflow-y: auto;
     }
 
-    .floating-panel:hover {
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-    }
-
-    /* Enhanced Legend */
+    /* Legend */
     .legend {
       bottom: var(--spacing-lg);
       right: var(--spacing-lg);
       padding: var(--spacing-md);
-      min-width: 220px;
-      max-width: 300px;
+      min-width: 200px;
+      max-width: 280px;
     }
 
     .legend-title {
-      font-size: 1rem;
+      font-size: 0.875rem;
       font-weight: 600;
       color: var(--text-primary);
-      margin: 0 0 var(--spacing-md);
+      margin: 0 0 var(--spacing-sm);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: var(--spacing-sm);
-      border-bottom: 2px solid var(--border-light);
     }
 
     .legend-stats {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
       margin-bottom: var(--spacing-md);
-      padding: var(--spacing-sm) var(--spacing-md);
-      background: var(--bg-tertiary);
-      border-radius: var(--radius-sm);
-      border-left: 4px solid var(--color-primary);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 1px solid var(--border-light);
     }
 
     .legend-item {
       display: flex;
       align-items: center;
       gap: var(--spacing-sm);
-      margin-bottom: var(--spacing-sm);
-      font-size: 0.8rem;
-      padding: var(--spacing-xs) 0;
+      margin-bottom: var(--spacing-xs);
+      font-size: 0.75rem;
     }
 
     .legend-dot {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
       flex-shrink: 0;
-      border: 2px solid white;
-      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0, 0, 0, 0.1);
     }
 
-    /* Enhanced Toast Notifications */
+    /* Toast Notifications */
     .toast {
       position: fixed;
       top: var(--spacing-lg);
       right: var(--spacing-lg);
       background: var(--bg-primary);
       border: 1px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-md) var(--spacing-lg);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-md);
       box-shadow: var(--shadow-xl);
       z-index: 2000;
       display: none;
-      max-width: 420px;
+      max-width: 400px;
       font-size: 0.875rem;
-      animation: slideInToast 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      animation: slideIn 0.3s ease-out;
     }
 
     .toast.success {
       border-left: 4px solid var(--color-success);
-      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
     }
 
     .toast.error {
       border-left: 4px solid var(--color-error);
-      background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
     }
 
     .toast.warning {
       border-left: 4px solid var(--color-warning);
-      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
     }
 
-    @keyframes slideInToast {
+    @keyframes slideIn {
       from {
-        transform: translateX(120%) scale(0.8);
+        transform: translateX(100%);
         opacity: 0;
       }
       to {
-        transform: translateX(0) scale(1);
+        transform: translateX(0);
         opacity: 1;
       }
     }
 
-    /* Enhanced Loading Indicator */
+    /* Loading Indicator */
     .loading {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: var(--bg-overlay);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(10px);
       border: 1px solid var(--border-light);
-      border-radius: var(--radius-xl);
+      border-radius: var(--radius-lg);
       padding: var(--spacing-xl);
       box-shadow: var(--shadow-xl);
       z-index: 1500;
@@ -452,10 +377,10 @@
     }
 
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid var(--border-light);
-      border-top: 4px solid var(--color-primary);
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border-light);
+      border-top: 3px solid var(--color-primary);
       border-radius: 50%;
       animation: spin 1s linear infinite;
       margin: 0 auto var(--spacing-md);
@@ -466,33 +391,28 @@
       100% { transform: rotate(360deg); }
     }
 
-    .loading-text {
-      font-size: 0.95rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    /* Enhanced Statistics Panel */
+    /* Statistics Panel */
     .stats-panel {
-      top: 120px;
+      top: 100px;
       right: var(--spacing-lg);
-      bottom: 120px;
-      width: 380px;
-      padding: var(--spacing-lg);
+      bottom: 100px;
+      width: 350px;
+      padding: var(--spacing-md);
       display: none;
+      overflow-y: auto;
     }
 
     .panel-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: var(--spacing-lg);
-      padding-bottom: var(--spacing-md);
-      border-bottom: 2px solid var(--border-light);
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 1px solid var(--border-light);
     }
 
     .panel-title {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 600;
       color: var(--text-primary);
       margin: 0;
@@ -503,20 +423,15 @@
       height: 32px;
       padding: 0;
       border-radius: 50%;
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-medium);
+      background: transparent;
+      border: 1px solid var(--border-light);
       color: var(--text-muted);
-      font-size: 1.1rem;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 0.75rem;
     }
 
     .btn-close:hover {
-      background: var(--color-error);
-      color: var(--text-inverse);
-      border-color: var(--color-error);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
     }
 
     /* Chart Container */
@@ -526,17 +441,9 @@
       border-radius: var(--radius-md);
       padding: var(--spacing-md);
       margin-bottom: var(--spacing-md);
-      box-shadow: var(--shadow-sm);
     }
 
-    .chart-title {
-      margin: 0 0 var(--spacing-md);
-      color: var(--text-primary);
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    /* Enhanced Floating Action Buttons */
+    /* Floating Action Buttons */
     .fab-container {
       position: absolute;
       top: var(--spacing-lg);
@@ -547,48 +454,43 @@
     }
 
     .fab {
-      width: 52px;
-      height: 52px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       background: var(--bg-primary);
       border: 1px solid var(--border-light);
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-md);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all var(--transition-fast);
-      font-size: 1.1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
       color: var(--text-secondary);
-      backdrop-filter: blur(10px);
     }
 
     .fab:hover {
       background: var(--color-primary);
       color: var(--text-inverse);
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: var(--shadow-xl);
-      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
     }
 
-    .fab:active {
-      transform: translateY(-1px) scale(1.02);
-    }
-
-    /* Enhanced Timeline Controls */
+    /* Timeline Controls */
     .timeline-controls {
       position: absolute;
       bottom: var(--spacing-lg);
       left: 50%;
       transform: translateX(-50%);
       background: var(--bg-overlay);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(10px);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-      box-shadow: var(--shadow-xl);
+      padding: var(--spacing-md);
+      box-shadow: var(--shadow-lg);
       display: none;
-      min-width: 420px;
+      min-width: 400px;
       z-index: 600;
     }
 
@@ -597,112 +499,30 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: var(--spacing-md);
-      padding-bottom: var(--spacing-sm);
-      border-bottom: 1px solid var(--border-light);
-    }
-
-    .timeline-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin: 0;
-    }
-
-    .timeline-controls-group {
-      display: flex;
-      gap: var(--spacing-sm);
     }
 
     .timeline-slider {
       width: 100%;
-      margin: var(--spacing-md) 0;
-      height: 6px;
-      border-radius: 3px;
-      background: var(--bg-tertiary);
-      outline: none;
-      cursor: pointer;
+      margin: var(--spacing-sm) 0;
     }
 
     .timeline-time {
-      font-size: 1.1rem;
+      font-size: 0.875rem;
       font-weight: 600;
-      color: var(--color-primary);
-      text-align: center;
-      background: var(--bg-tertiary);
-      padding: var(--spacing-sm) var(--spacing-md);
-      border-radius: var(--radius-sm);
-    }
-
-    /* Enhanced RSS Items */
-    .rss-container {
-      margin-top: var(--spacing-lg);
-    }
-
-    .rss-filter {
-      width: 100%;
-      margin-bottom: var(--spacing-md);
-      padding: 10px 12px;
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-sm);
-      background: var(--bg-primary);
       color: var(--text-primary);
-    }
-
-    .rss-item {
-      border-bottom: 1px solid var(--border-light);
-      padding: var(--spacing-md) 0;
-      transition: background var(--transition-fast);
-    }
-
-    .rss-item:hover {
-      background: var(--bg-tertiary);
-      margin: 0 calc(-1 * var(--spacing-md));
-      padding-left: var(--spacing-md);
-      padding-right: var(--spacing-md);
-      border-radius: var(--radius-sm);
-    }
-
-    .rss-title {
-      margin: 0 0 var(--spacing-xs);
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-
-    .rss-title a {
-      color: var(--color-primary);
-      text-decoration: none;
-      transition: color var(--transition-fast);
-    }
-
-    .rss-title a:hover {
-      color: var(--color-primary-dark);
-    }
-
-    .rss-meta {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-bottom: var(--spacing-xs);
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-    }
-
-    .rss-description {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      line-height: 1.4;
+      text-align: center;
     }
 
     /* Responsive Design */
-    @media (max-width: 1200px) {
+    @media (max-width: 1024px) {
       .legend {
         bottom: var(--spacing-sm);
         right: var(--spacing-sm);
-        max-width: 260px;
+        max-width: 240px;
       }
 
       .stats-panel {
-        width: 340px;
+        width: 300px;
         right: var(--spacing-sm);
       }
 
@@ -713,18 +533,12 @@
     }
 
     @media (max-width: 768px) {
-      .header {
-        padding: var(--spacing-md) var(--spacing-lg);
+      header {
+        padding: var(--spacing-sm) var(--spacing-md);
       }
 
-      .header-top {
-        flex-direction: column;
-        gap: var(--spacing-md);
-        text-align: center;
-      }
-
-      .brand-info h1 {
-        font-size: 1.5rem;
+      h1 {
+        font-size: 1.25rem;
       }
 
       .controls {
@@ -745,8 +559,6 @@
         width: calc(100vw - 2 * var(--spacing-sm));
         right: var(--spacing-sm);
         left: var(--spacing-sm);
-        top: 80px;
-        bottom: 80px;
       }
 
       .timeline-controls {
@@ -761,23 +573,14 @@
       }
 
       .fab {
-        width: 48px;
-        height: 48px;
-        font-size: 1rem;
-      }
-
-      .legend {
-        bottom: var(--spacing-sm);
-        right: var(--spacing-sm);
-        left: var(--spacing-sm);
-        max-width: none;
+        width: 44px;
+        height: 44px;
       }
     }
 
     /* Map Marker Animations */
     .crime-marker {
       transition: all var(--transition-fast);
-      cursor: pointer;
     }
 
     .crime-marker:hover {
@@ -802,10 +605,10 @@
       50% { opacity: 0.85; }
     }
 
-    /* Enhanced Leaflet Popup Styling */
+    /* Custom Leaflet Popup Styling */
     .leaflet-popup-content-wrapper {
       background: var(--bg-primary);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-md);
       box-shadow: var(--shadow-xl);
       border: 1px solid var(--border-light);
     }
@@ -814,7 +617,7 @@
       margin: 0;
       font-family: inherit;
       font-size: 0.875rem;
-      line-height: 1.6;
+      line-height: 1.5;
       color: var(--text-primary);
     }
 
@@ -823,26 +626,6 @@
       border: 1px solid var(--border-light);
       border-top: none;
       border-right: none;
-    }
-
-    .leaflet-popup-close-button {
-      background: var(--bg-tertiary);
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      right: 8px;
-      top: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .leaflet-popup-close-button:hover {
-      background: var(--color-error);
-      color: var(--text-inverse);
     }
 
     /* Accessibility */
@@ -873,84 +656,26 @@
         display: none !important;
       }
 
-      .header {
+      header {
         position: static;
         box-shadow: none;
-        background: var(--bg-primary);
-        color: var(--text-primary);
       }
-
-      #map {
-        height: 80vh;
-      }
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg-tertiary);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--color-secondary);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--color-secondary-light);
-    }
-
-    /* Enhanced select styling for better UX */
-    select[multiple] {
-      min-height: 100px;
-      background-image: none;
-    }
-
-    option {
-      padding: 8px;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-    }
-
-    option:hover,
-    option:checked {
-      background: var(--color-primary-light);
-      color: var(--text-inverse);
-    }
-
-    /* Loading states for better UX */
-    .loading-skeleton {
-      background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
-      background-size: 200% 100%;
-      animation: loading-shimmer 2s infinite;
-    }
-
-    @keyframes loading-shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
     }
   </style>
 </head>
 
 <body>
   <div id="app">
-    <header class="header">
+    <header>
       <div class="header-content">
-        <div class="header-top">
-          <div class="logo-section">
-            <div class="logo">🚓</div>
-            <div class="brand-info">
-              <h1>Aktuella Brott</h1>
-              <p class="tagline">Interaktiv realtidskarta över polishändelser i Sverige</p>
-            </div>
+        <div class="header-title">
+          <div>
+            <h1>Polishändelser Sverige</h1>
+            <p class="header-subtitle">Interaktiv realtidskarta med de senaste polishändelserna och alla polisstationer</p>
           </div>
           <div class="status-indicator">
             <div class="status-dot"></div>
-            <span class="status-text">Live-data från Polisen</span>
+            <span>Live-data</span>
           </div>
         </div>
 
@@ -989,10 +714,10 @@
             <label class="control-label">Visningsläge</label>
             <div class="button-group">
               <button id="view-markers" class="btn-secondary active" aria-label="Visa som markörer">
-                📍 Markörer
+                Markörer
               </button>
               <button id="view-heatmap" class="btn-secondary" aria-label="Visa som värmekarta">
-                🔥 Värmekarta
+                Värmekarta
               </button>
             </div>
           </div>
@@ -1001,13 +726,13 @@
             <label class="control-label">Funktioner</label>
             <div class="button-group">
               <button id="locate-user" class="btn-secondary" aria-label="Visa min position">
-                📍 Min position
+                Min position
               </button>
               <button id="timeline-toggle" class="btn-secondary" aria-label="Visa tidslinje">
-                ⏰ Tidslinje
+                Tidslinje
               </button>
               <button id="refresh-data" class="btn-primary" aria-label="Uppdatera data">
-                🔄 Uppdatera
+                Uppdatera
               </button>
             </div>
           </div>
@@ -1020,10 +745,10 @@
 
   <!-- Floating Action Buttons -->
   <div class="fab-container">
-    <button class="fab" id="fullscreen-toggle" aria-label="Fullskärm" title="Fullskärmsläge (F)">
+    <button class="fab" id="fullscreen-toggle" aria-label="Fullskärm" title="Fullskärmsläge">
       ⛶
     </button>
-    <button class="fab" id="stats-toggle" aria-label="Statistik" title="Visa statistik (S)">
+    <button class="fab" id="stats-toggle" aria-label="Statistik" title="Visa statistik">
       📊
     </button>
   </div>
@@ -1031,11 +756,11 @@
   <!-- Legend -->
   <div class="legend floating-panel" id="legend">
     <h3 class="legend-title">
-      📈 Översikt
+      Översikt
       <button class="btn-close" id="legend-close" aria-label="Stäng legend">×</button>
     </h3>
     <div class="legend-stats" id="legend-stats">
-      <div class="loading-skeleton" style="height: 60px; border-radius: 4px;"></div>
+      Laddar statistik...
     </div>
     <div id="legend-items">
       <!-- Dynamically populated -->
@@ -1045,31 +770,30 @@
   <!-- Statistics Panel -->
   <div class="stats-panel floating-panel" id="stats-panel">
     <div class="panel-header">
-      <h2 class="panel-title">📊 Detaljerad Statistik</h2>
+      <h2 class="panel-title">Detaljerad Statistik</h2>
       <button class="btn-close" id="stats-close" aria-label="Stäng statistikpanel">×</button>
     </div>
 
     <div class="chart-container">
-      <h4 class="chart-title">⏰ Händelser över tid</h4>
+      <h4 style="margin: 0 0 16px; color: var(--text-primary);">Händelser över tid</h4>
       <canvas id="timeline-chart" width="300" height="150"></canvas>
     </div>
 
     <div class="chart-container">
-      <h4 class="chart-title">📋 Typ av händelser</h4>
+      <h4 style="margin: 0 0 16px; color: var(--text-primary);">Typ av händelser</h4>
       <canvas id="type-chart" width="300" height="150"></canvas>
     </div>
 
-    <div class="rss-container">
-      <h4 class="chart-title">📰 Senaste nyheterna</h4>
+    <div id="rss-container">
+      <h4 style="margin: 0 0 16px; color: var(--text-primary);">Senaste nyheterna</h4>
       <input
         id="rss-filter"
         type="text"
         placeholder="Filtrera nyheter..."
-        class="rss-filter"
-        aria-label="Filtrera nyheter"
+        style="width: 100%; margin-bottom: 16px; padding: 8px 12px; border: 1px solid var(--border-medium); border-radius: var(--radius-sm);"
       >
       <div id="rss-items">
-        <div class="loading-skeleton" style="height: 200px; border-radius: 4px;"></div>
+        <!-- Dynamically populated -->
       </div>
     </div>
   </div>
@@ -1077,10 +801,10 @@
   <!-- Timeline Controls -->
   <div class="timeline-controls floating-panel" id="timeline-panel">
     <div class="timeline-header">
-      <h3 class="timeline-title">⏰ Tidslinje-uppspelning</h3>
-      <div class="timeline-controls-group">
-        <button id="timeline-play" class="btn-secondary">▶️ Spela</button>
-        <button id="timeline-pause" class="btn-secondary">⏸️ Pausa</button>
+      <h3 style="margin: 0; font-size: 0.875rem; color: var(--text-primary);">Tidslinje-uppspelning</h3>
+      <div style="display: flex; gap: 8px;">
+        <button id="timeline-play" class="btn-secondary">Spela</button>
+        <button id="timeline-pause" class="btn-secondary">Pausa</button>
         <button id="timeline-close" class="btn-close">×</button>
       </div>
     </div>
@@ -1093,7 +817,7 @@
       value="0"
       aria-label="Tidslinje för timme på dagen"
     >
-    <div class="timeline-time" id="timeline-time">🕐 00:00</div>
+    <div class="timeline-time" id="timeline-time">00:00</div>
   </div>
 
   <!-- Toast Notifications -->
@@ -1104,7 +828,7 @@
   <!-- Loading Indicator -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <div class="loading-text" id="loading-text">Laddar data från Polisen...</div>
+    <div id="loading-text">Laddar data...</div>
   </div>
 
   <!-- Scripts -->
@@ -1112,6 +836,1852 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="js/app.js"></script>
+
+  <script>
+    'use strict';
+
+    // ===== UTILITY FUNCTIONS =====
+    class Utils {
+      // Toast notifications with better UX
+      static showToast(message, duration = 3000, type = 'info') {
+        const toast = document.getElementById('toast');
+        const existingTimer = toast._timer;
+
+        if (existingTimer) {
+          clearTimeout(existingTimer);
+        }
+
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = 'block';
+
+        toast._timer = setTimeout(() => {
+          toast.style.display = 'none';
+          toast._timer = null;
+        }, duration);
+      }
+
+      // Loading state management
+      static showLoading(text = 'Laddar...') {
+        document.getElementById('loading-text').textContent = text;
+        document.getElementById('loading').style.display = 'block';
+      }
+
+      static hideLoading() {
+        document.getElementById('loading').style.display = 'none';
+      }
+
+      // Debounce function for performance
+      static debounce(func, delay) {
+        let timeoutId;
+        return (...args) => {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => func.apply(null, args), delay);
+        };
+      }
+
+      // Throttle function for performance
+      static throttle(func, delay) {
+        let lastCall = 0;
+        return (...args) => {
+          const now = Date.now();
+          if (now - lastCall >= delay) {
+            lastCall = now;
+            func.apply(null, args);
+          }
+        };
+      }
+
+      // Enhanced fetch with retry logic
+      static async fetchWithRetry(url, options = {}, maxRetries = 3) {
+        let lastError;
+
+        for (let i = 0; i < maxRetries; i++) {
+          try {
+            const response = await fetch(url, options);
+
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            return response;
+          } catch (error) {
+            lastError = error;
+
+            if (i < maxRetries - 1) {
+              // Exponential backoff
+              const delay = Math.min(1000 * Math.pow(2, i), 5000);
+              await new Promise(resolve => setTimeout(resolve, delay));
+            }
+          }
+        }
+
+        throw lastError;
+      }
+
+      // Safe JSON parsing
+      static async safeJsonParse(response) {
+        const text = await response.text();
+        try {
+          return JSON.parse(text);
+        } catch (error) {
+          throw new Error(`Invalid JSON response: ${error.message}`);
+        }
+      }
+
+      // Sanitize HTML to prevent XSS
+      static sanitizeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      // Format date in Swedish locale
+      static formatDate(date, options = {}) {
+        return new Intl.DateTimeFormat('sv-SE', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          ...options
+        }).format(date);
+      }
+
+      // Generate stable ID from object
+      static generateStableId(obj) {
+        const str = JSON.stringify(obj, Object.keys(obj).sort());
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          const char = str.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash; // Convert to 32-bit integer
+        }
+        return `id_${Math.abs(hash).toString(36)}`;
+      }
+    }
+
+    // ===== CRIME SEVERITY SYSTEM =====
+    class CrimeSeveritySystem {
+      static SEVERITY_MAPPING = {
+        // Level 1 - Minor offenses (Muted Green)
+        'Trafikbrott': { level: 1, color: '#6b7280', description: 'Trafikbrott' },
+        'Fortkörning': { level: 1, color: '#6b7280', description: 'Fortkörning' },
+        'Parkering': { level: 1, color: '#6b7280', description: 'Parkeringsbrott' },
+        'Ordningslagen': { level: 1, color: '#6b7280', description: 'Ordningslagen' },
+
+        // Level 2 - Property crimes (Muted Yellow-Orange)
+        'Skadegörelse': { level: 2, color: '#a16207', description: 'Skadegörelse' },
+        'Stöld': { level: 2, color: '#92400e', description: 'Stöld' },
+        'Snatteri': { level: 2, color: '#92400e', description: 'Snatteri' },
+        'Bedrägeri': { level: 2, color: '#92400e', description: 'Bedrägeri' },
+        'Inbrott': { level: 2, color: '#78350f', description: 'Inbrott' },
+
+        // Level 3 - Drug crimes and serious property crimes (Muted Orange-Red)
+        'Narkotikabrott': { level: 3, color: '#a16207', description: 'Narkotikabrott' },
+        'Rattfylleri': { level: 3, color: '#a16207', description: 'Rattfylleri' },
+        'Rån': { level: 3, color: '#92400e', description: 'Rån' },
+
+        // Level 4 - Violent crimes (Muted Red)
+        'Misshandel': { level: 4, color: '#7c2d12', description: 'Misshandel' },
+        'Våldtäkt': { level: 4, color: '#7c2d12', description: 'Våldtäkt' },
+        'Våld mot tjänsteman': { level: 4, color: '#7c2d12', description: 'Våld mot tjänsteman' },
+        'Olaga hot': { level: 4, color: '#7c2d12', description: 'Olaga hot' },
+
+        // Level 5 - Most serious crimes (Dark Muted Red)
+        'Mord': { level: 5, color: '#78716c', description: 'Mord' },
+        'Dråp': { level: 5, color: '#78716c', description: 'Dråp' },
+        'Mordbrand': { level: 5, color: '#78716c', description: 'Mordbrand' },
+        'Brand': { level: 4, color: '#7c2d12', description: 'Brand' },
+
+        // Default
+        'Övrigt': { level: 2, color: '#6b7280', description: 'Övrigt' }
+      };
+
+      static getSeverityInfo(crimeType) {
+        // Direct match
+        if (this.SEVERITY_MAPPING[crimeType]) {
+          return this.SEVERITY_MAPPING[crimeType];
+        }
+
+        // Fuzzy matching for similar crime types
+        const lowerType = crimeType.toLowerCase();
+
+        for (const [key, value] of Object.entries(this.SEVERITY_MAPPING)) {
+          if (lowerType.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerType)) {
+            return value;
+          }
+        }
+
+        // Check for partial matches with common crime terms
+        const crimeKeywords = {
+          'stöld': this.SEVERITY_MAPPING['Stöld'],
+          'inbrott': this.SEVERITY_MAPPING['Inbrott'],
+          'rån': this.SEVERITY_MAPPING['Rån'],
+          'misshandel': this.SEVERITY_MAPPING['Misshandel'],
+          'narkotika': this.SEVERITY_MAPPING['Narkotikabrott'],
+          'trafik': this.SEVERITY_MAPPING['Trafikbrott'],
+          'brand': this.SEVERITY_MAPPING['Brand'],
+          'våld': this.SEVERITY_MAPPING['Misshandel']
+        };
+
+        for (const [keyword, severity] of Object.entries(crimeKeywords)) {
+          if (lowerType.includes(keyword)) {
+            return severity;
+          }
+        }
+
+        // Default fallback
+        return this.SEVERITY_MAPPING['Övrigt'];
+      }
+
+      static getSeverityColor(crimeType) {
+        return this.getSeverityInfo(crimeType).color;
+      }
+
+      static getSeverityLevel(crimeType) {
+        return this.getSeverityInfo(crimeType).level;
+      }
+
+      static getAllSeverityLevels() {
+        const levels = {};
+        Object.values(this.SEVERITY_MAPPING).forEach(info => {
+          if (!levels[info.level]) {
+            levels[info.level] = [];
+          }
+          levels[info.level].push(info);
+        });
+        return levels;
+      }
+    }
+
+    // ===== DATA MODELS =====
+    class PoliceEvent {
+      constructor(rawData) {
+        this.id = Utils.generateStableId(rawData);
+        this.rawData = rawData;
+        this.parseData();
+      }
+
+      parseData() {
+        const raw = this.rawData;
+
+        // Parse coordinates
+        this.parseCoordinates();
+
+        // Parse date/time
+        this.parseDateTime();
+
+        // Extract location information
+        this.parseLocation();
+
+        // Parse event details
+        this.type = raw.type || 'Okänd händelse';
+        this.title = raw.name || raw.title || this.type;
+        this.description = raw.summary || raw.description || '';
+        this.url = raw.url || null;
+
+        // Determine location accuracy
+        this.exactLocation = this.hasExactCoordinates();
+
+        // Get severity information
+        this.severityInfo = CrimeSeveritySystem.getSeverityInfo(this.type);
+      }
+
+      parseCoordinates() {
+        const raw = this.rawData;
+        let lat = null, lng = null;
+
+        // Try different coordinate formats
+        if (raw.location && raw.location.gps) {
+          const gps = raw.location.gps;
+          if (typeof gps === 'string') {
+            const coords = gps.split(',').map(c => parseFloat(c.trim()));
+            if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+              [lat, lng] = coords;
+            }
+          } else if (gps.lat && gps.lng) {
+            lat = parseFloat(gps.lat);
+            lng = parseFloat(gps.lng);
+          }
+        }
+
+        // Validate coordinates are within Sweden's bounds
+        if (lat && lng && this.isWithinSweden(lat, lng)) {
+          this.lat = lat;
+          this.lng = lng;
+        } else {
+          this.lat = null;
+          this.lng = null;
+        }
+      }
+
+      parseDateTime() {
+        const raw = this.rawData;
+        const dateStr = raw.datetime || raw.pubDate || raw.date;
+
+        if (dateStr) {
+          this.timestamp = new Date(dateStr);
+          if (isNaN(this.timestamp)) {
+            // Try alternative parsing
+            this.timestamp = new Date();
+          }
+        } else {
+          this.timestamp = new Date();
+        }
+
+        this.timeMs = this.timestamp.getTime();
+      }
+
+      parseLocation() {
+        const raw = this.rawData;
+
+        // Extract city/location name
+        this.city = raw.location?.name || 'Okänd plats';
+
+        // Try to extract address from description or summary
+        this.address = this.extractAddress() || this.city;
+
+        // Apply random offset if no exact location (privacy/accuracy)
+        if (!this.hasExactCoordinates() && this.lat && this.lng) {
+          this.applyRandomOffset();
+        }
+      }
+
+      extractAddress() {
+        const text = (this.description + ' ' + this.title).toLowerCase();
+
+        // Swedish address patterns
+        const patterns = [
+          /(?:vid|på|i|från)\s+([A-ZÅÄÖ][a-zåäö]+(?:gatan|vägen|torget|platsen|parken))/i,
+          /(?:vid|på|i|från)\s+([A-ZÅÄÖ][a-zåäö]+\s+\d+)/i,
+          /(\w+gatan\s+\d+)/i,
+          /(\w+vägen\s+\d+)/i
+        ];
+
+        for (const pattern of patterns) {
+          const match = text.match(pattern);
+          if (match) {
+            return match[1];
+          }
+        }
+
+        return null;
+      }
+
+      hasExactCoordinates() {
+        const text = (this.description + ' ' + this.title).toLowerCase();
+
+        // Indicators of exact location
+        const exactIndicators = ['gatan', 'vägen', 'torget', 'platsen', 'nummer'];
+        const approximateIndicators = ['området', 'närheten', 'cirka', 'ungefär'];
+
+        const hasExact = exactIndicators.some(ind => text.includes(ind));
+        const hasApproximate = approximateIndicators.some(ind => text.includes(ind));
+
+        return hasExact && !hasApproximate;
+      }
+
+      applyRandomOffset() {
+        if (!this.lat || !this.lng) return;
+
+        // Add random offset up to ~500 meters
+        const offsetLat = (Math.random() - 0.5) * 0.008; // ~0.4km
+        const offsetLng = (Math.random() - 0.5) * 0.012; // ~0.4km
+
+        this.lat += offsetLat;
+        this.lng += offsetLng;
+      }
+
+      isWithinSweden(lat, lng) {
+        // Sweden's approximate bounds
+        return lat >= 55.0 && lat <= 69.1 && lng >= 10.5 && lng <= 24.2;
+      }
+
+      isValidEvent() {
+        return this.lat && this.lng && this.timestamp && this.type;
+      }
+
+      getFormattedTime() {
+        return Utils.formatDate(this.timestamp);
+      }
+
+      getPopupContent() {
+        const severityColor = this.severityInfo.color;
+        const locationAccuracy = this.exactLocation ?
+          '<span style="color: var(--color-success); font-size: 0.75rem; font-weight: 500;">📍 Exakt position</span>' :
+          '<span style="color: var(--color-warning); font-size: 0.75rem; font-weight: 500;">📍 Ungefärlig position</span>';
+
+        const fullAddress = this.address !== this.city ? this.address : this.city;
+
+        return `
+          <div style="min-width: 260px; font-family: inherit; line-height: 1.5;">
+            <h3 style="margin: 0 0 12px; color: var(--text-primary); font-size: 1rem; border-bottom: 2px solid ${severityColor}; padding-bottom: 6px;">
+              ${Utils.sanitizeHTML(this.title)}
+            </h3>
+
+            <div style="margin: 8px 0; padding: 8px 12px; background: var(--bg-tertiary); border-left: 3px solid ${severityColor}; border-radius: 4px;">
+              <strong style="color: var(--text-primary); font-size: 0.875rem;">
+                ${Utils.sanitizeHTML(this.severityInfo.description)}
+              </strong>
+            </div>
+
+            <div style="margin: 12px 0;">
+              <strong style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                Plats:
+              </strong><br/>
+              <span style="color: var(--text-primary); font-size: 0.875rem;">
+                ${Utils.sanitizeHTML(fullAddress)}
+              </span><br/>
+              ${locationAccuracy}
+            </div>
+
+            <div style="margin: 12px 0;">
+              <strong style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                Tid:
+              </strong><br/>
+              <span style="color: var(--text-primary); font-size: 0.875rem;">
+                ${this.getFormattedTime()}
+              </span>
+            </div>
+
+            ${this.description ? `
+              <div style="margin: 12px 0; padding-top: 8px; border-top: 1px solid var(--border-light);">
+                <div style="color: var(--text-secondary); font-size: 0.8rem;">
+                  ${Utils.sanitizeHTML(this.description)}
+                </div>
+              </div>
+            ` : ''}
+
+            ${this.url ? `
+              <div style="margin: 12px 0; padding-top: 8px; border-top: 1px solid var(--border-light);">
+                <a href="${this.url}" target="_blank" style="color: var(--color-primary); text-decoration: none; font-size: 0.875rem; font-weight: 500;">
+                  Mer information →
+                </a>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+    }
+
+    class PoliceStation {
+      constructor(rawData) {
+        this.id = Utils.generateStableId(rawData);
+        this.rawData = rawData;
+        this.parseData();
+      }
+
+      parseData() {
+        const raw = this.rawData;
+
+        this.name = raw.name || 'Polisstation';
+        this.parseCoordinates();
+        this.parseContactInfo();
+        this.parseServices();
+      }
+
+      parseCoordinates() {
+        const raw = this.rawData;
+        let lat = null, lng = null;
+
+        const location = raw.location;
+        if (location) {
+          const gps = location.gps || location.position || location.coordinates;
+
+          if (typeof gps === 'string') {
+            const coords = gps.split(',').map(c => parseFloat(c.trim()));
+            if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+              [lat, lng] = coords;
+            }
+          } else if (gps && typeof gps === 'object') {
+            lat = gps.lat || gps.y;
+            lng = gps.lng || gps.lon || gps.x;
+          }
+        }
+
+        this.lat = lat;
+        this.lng = lng;
+      }
+
+      parseContactInfo() {
+        const raw = this.rawData;
+
+        this.address = raw.location?.name || raw.location?.address || 'Adress ej tillgänglig';
+        this.phone = raw.phone || raw.contact?.phone || '';
+        this.email = raw.email || raw.contact?.email || '';
+        this.website = raw.url || raw.Url || raw.location?.url || null;
+        this.openingHours = raw.openingHours || raw.hours || '';
+      }
+
+      parseServices() {
+        const raw = this.rawData;
+        this.services = Array.isArray(raw.services) ? raw.services : [];
+        this.servicesText = this.services.length > 0 ? this.services.join(', ') : 'Allmänna polistjänster';
+      }
+
+      isValidStation() {
+        return this.lat && this.lng && this.name;
+      }
+
+      createMarker() {
+        if (!this.isValidStation()) return null;
+
+        const icon = L.divIcon({
+          className: 'police-station-icon',
+          html: '<div style="background: var(--color-secondary); border: 2px solid white; border-radius: 50%; width: 10px; height: 10px; box-shadow: var(--shadow-sm);"></div>',
+          iconSize: [10, 10],
+          iconAnchor: [5, 5]
+        });
+
+        const marker = L.marker([this.lat, this.lng], {
+          icon: icon,
+          zIndexOffset: 100 // Below crime events
+        });
+
+        marker.bindPopup(this.getPopupContent(), {
+          maxWidth: 320,
+          className: 'police-station-popup'
+        });
+
+        return marker;
+      }
+
+      getPopupContent() {
+        return `
+          <div style="min-width: 240px; font-family: inherit; line-height: 1.5;">
+            <h3 style="margin: 0 0 12px; color: var(--text-primary); font-size: 1rem; border-bottom: 2px solid var(--color-primary); padding-bottom: 6px;">
+              🏢 ${Utils.sanitizeHTML(this.name)}
+            </h3>
+
+            <div style="margin: 12px 0;">
+              <strong style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                Adress:
+              </strong><br/>
+              <span style="color: var(--text-primary); font-size: 0.875rem;">
+                ${Utils.sanitizeHTML(this.address)}
+              </span>
+            </div>
+
+            <div style="margin: 12px 0;">
+              <strong style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                Tjänster:
+              </strong><br/>
+              <span style="color: var(--text-primary); font-size: 0.875rem;">
+                ${Utils.sanitizeHTML(this.servicesText)}
+              </span>
+            </div>
+
+            ${this.phone ? `
+              <div style="margin: 12px 0;">
+                <strong style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                  Telefon:
+                </strong><br/>
+                <a href="tel:${this.phone}" style="color: var(--color-primary); text-decoration: none; font-size: 0.875rem;">
+                  📞 ${this.phone}
+                </a>
+              </div>
+            ` : ''}
+
+            ${this.email ? `
+              <div style="margin: 12px 0;">
+                <strong style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                  E-post:
+                </strong><br/>
+                <a href="mailto:${this.email}" style="color: var(--color-primary); text-decoration: none; font-size: 0.875rem;">
+                  ✉️ ${this.email}
+                </a>
+              </div>
+            ` : ''}
+
+            ${this.openingHours ? `
+              <div style="margin: 12px 0;">
+                <strong style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                  Öppettider:
+                </strong><br/>
+                <span style="color: var(--text-primary); font-size: 0.875rem;">
+                  ${Utils.sanitizeHTML(this.openingHours)}
+                </span>
+              </div>
+            ` : ''}
+
+            ${this.website ? `
+              <div style="margin: 12px 0; padding-top: 8px; border-top: 1px solid var(--border-light);">
+                <a href="${this.website}" target="_blank" style="color: var(--color-primary); text-decoration: none; font-size: 0.875rem; font-weight: 500;">
+                  🌐 Mer information →
+                </a>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+    }
+
+    // ===== DATA STORAGE =====
+    class DataStorage {
+      static DB_NAME = 'PoliceEventsDB';
+      static DB_VERSION = 1;
+      static EVENTS_STORE = 'events';
+      static STATIONS_STORE = 'stations';
+
+      static db = null;
+
+      static async initialize() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+
+          request.onerror = () => reject(request.error);
+          request.onsuccess = () => {
+            this.db = request.result;
+            resolve();
+          };
+
+          request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+
+            // Events store
+            if (!db.objectStoreNames.contains(this.EVENTS_STORE)) {
+              const eventsStore = db.createObjectStore(this.EVENTS_STORE, { keyPath: 'id' });
+              eventsStore.createIndex('timestamp', 'timeMs');
+              eventsStore.createIndex('type', 'type');
+              eventsStore.createIndex('city', 'city');
+            }
+
+            // Stations store
+            if (!db.objectStoreNames.contains(this.STATIONS_STORE)) {
+              const stationsStore = db.createObjectStore(this.STATIONS_STORE, { keyPath: 'id' });
+            }
+          };
+        });
+      }
+
+      static async saveEvents(events) {
+        if (!this.db) await this.initialize();
+
+        return new Promise((resolve, reject) => {
+          const transaction = this.db.transaction([this.EVENTS_STORE], 'readwrite');
+          const store = transaction.objectStore(this.EVENTS_STORE);
+
+          transaction.onerror = () => reject(transaction.error);
+          transaction.oncomplete = () => resolve();
+
+          events.forEach(event => {
+            const eventData = {
+              id: event.id,
+              timeMs: event.timeMs,
+              timestamp: event.timestamp,
+              type: event.type,
+              title: event.title,
+              description: event.description,
+              city: event.city,
+              address: event.address,
+              lat: event.lat,
+              lng: event.lng,
+              exactLocation: event.exactLocation,
+              severityInfo: event.severityInfo,
+              url: event.url
+            };
+            store.put(eventData);
+          });
+        });
+      }
+
+      static async getRecentEvents(maxAge = 7 * 24 * 60 * 60 * 1000) { // 7 days
+        if (!this.db) await this.initialize();
+
+        const cutoff = Date.now() - maxAge;
+
+        return new Promise((resolve, reject) => {
+          const transaction = this.db.transaction([this.EVENTS_STORE], 'readonly');
+          const store = transaction.objectStore(this.EVENTS_STORE);
+          const index = store.index('timestamp');
+
+          const range = IDBKeyRange.lowerBound(cutoff);
+          const request = index.getAll(range);
+
+          request.onerror = () => reject(request.error);
+          request.onsuccess = () => resolve(request.result || []);
+        });
+      }
+
+      static async saveStations(stations) {
+        if (!this.db) await this.initialize();
+
+        return new Promise((resolve, reject) => {
+          const transaction = this.db.transaction([this.STATIONS_STORE], 'readwrite');
+          const store = transaction.objectStore(this.STATIONS_STORE);
+
+          transaction.onerror = () => reject(transaction.error);
+          transaction.oncomplete = () => resolve();
+
+          stations.forEach(station => {
+            const stationData = {
+              id: station.id,
+              name: station.name,
+              lat: station.lat,
+              lng: station.lng,
+              address: station.address,
+              phone: station.phone,
+              email: station.email,
+              website: station.website,
+              services: station.services,
+              servicesText: station.servicesText,
+              openingHours: station.openingHours
+            };
+            store.put(stationData);
+          });
+        });
+      }
+
+      static async getAllStations() {
+        if (!this.db) await this.initialize();
+
+        return new Promise((resolve, reject) => {
+          const transaction = this.db.transaction([this.STATIONS_STORE], 'readonly');
+          const store = transaction.objectStore(this.STATIONS_STORE);
+          const request = store.getAll();
+
+          request.onerror = () => reject(request.error);
+          request.onsuccess = () => resolve(request.result || []);
+        });
+      }
+    }
+
+    // ===== MAIN APPLICATION =====
+    class PoliceEventsApp {
+      constructor() {
+        this.state = {
+          events: [],
+          filteredEvents: [],
+          stations: [],
+          currentView: 'markers', // 'markers' | 'heatmap'
+          maxEvents: 500,
+          filters: {
+            types: [],
+            searchQuery: '',
+            timelineHour: null
+          },
+          map: null,
+          layers: {
+            eventCluster: null,
+            stationCluster: null,
+            heatLayer: null
+          },
+          ui: {
+            loading: false,
+            statsVisible: false,
+            timelineVisible: false,
+            timeline: {
+              playing: false,
+              currentHour: 0,
+              timer: null
+            }
+          },
+          userLocation: null,
+          charts: {
+            timeline: null,
+            types: null
+          }
+        };
+
+        this.initialize();
+      }
+
+      async initialize() {
+        try {
+          // Initialize storage
+          await DataStorage.initialize();
+
+          // Initialize map first
+          this.initializeMap();
+
+          // Bind event listeners
+          this.bindEventListeners();
+
+          // Load initial data and show immediately
+          await this.loadInitialData();
+
+          // Force immediate map update
+          this.renderEvents();
+          this.updateUI();
+
+          Utils.showToast('Kartan har laddats framgångsrikt', 3000, 'success');
+        } catch (error) {
+          console.error('Initialization error:', error);
+          Utils.showToast('Fel vid initialisering av kartan', 5000, 'error');
+        }
+      }
+
+      initializeMap() {
+        // Create map centered on Sweden
+        this.state.map = L.map('map', {
+          center: [62.0, 15.0],
+          zoom: 5,
+          zoomControl: true,
+          minZoom: 4,
+          maxZoom: 18
+        });
+
+        // Add tile layer with proper attribution
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+        }).addTo(this.state.map);
+
+        // Initialize marker clusters
+        this.initializeMarkerClusters();
+
+        // Map event listeners
+        this.state.map.on('zoomend', Utils.throttle(() => {
+          this.updateMarkerSizes();
+        }, 150));
+
+        this.state.map.on('moveend', Utils.throttle(() => {
+          this.updateVisibleStats();
+        }, 300));
+      }
+
+      initializeMarkerClusters() {
+        // Event cluster with reduced clustering for better individual visibility
+        this.state.layers.eventCluster = L.markerClusterGroup({
+          chunkedLoading: true,
+          maxClusterRadius: 25, // Reduced clustering
+          disableClusteringAtZoom: 11, // Show individual markers earlier
+          spiderfyOnMaxZoom: true,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          iconCreateFunction: (cluster) => {
+            const count = cluster.getChildCount();
+            const size = count < 10 ? 'small' : count < 100 ? 'medium' : 'large';
+
+            return L.divIcon({
+              html: `<div class="event-cluster-${size}" style="
+                background: var(--color-primary);
+                color: white;
+                border: 2px solid white;
+                border-radius: 50%;
+                width: ${size === 'small' ? '30px' : size === 'medium' ? '40px' : '50px'};
+                height: ${size === 'small' ? '30px' : size === 'medium' ? '40px' : '50px'};
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: ${size === 'small' ? '12px' : size === 'medium' ? '14px' : '16px'};
+                font-weight: 600;
+                box-shadow: var(--shadow-md);
+              ">${count}</div>`,
+              className: 'event-cluster-marker',
+              iconSize: [size === 'small' ? 30 : size === 'medium' ? 40 : 50, size === 'small' ? 30 : size === 'medium' ? 40 : 50]
+            });
+          }
+        });
+
+        // Police station cluster
+        this.state.layers.stationCluster = L.markerClusterGroup({
+          chunkedLoading: true,
+          maxClusterRadius: 40,
+          disableClusteringAtZoom: 9, // Cluster at lower zoom levels
+          spiderfyOnMaxZoom: false,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          iconCreateFunction: (cluster) => {
+            const count = cluster.getChildCount();
+
+            return L.divIcon({
+              html: `<div style="
+                background: var(--color-secondary);
+                color: white;
+                border: 1px solid white;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 11px;
+                font-weight: 500;
+                box-shadow: var(--shadow-sm);
+              ">${count}</div>`,
+              className: 'station-cluster-marker',
+              iconSize: [24, 24]
+            });
+          }
+        });
+
+        // Add station cluster to map (always visible)
+        this.state.layers.stationCluster.addTo(this.state.map);
+      }
+
+      bindEventListeners() {
+        // Control event listeners
+        document.getElementById('max-events').addEventListener('change',
+          Utils.debounce(() => this.updateMaxEvents(), 300));
+
+        document.getElementById('event-type').addEventListener('change',
+          () => this.updateTypeFilter());
+
+        document.getElementById('search-query').addEventListener('input',
+          Utils.debounce(() => this.updateSearchFilter(), 300));
+
+        // View mode buttons
+        document.getElementById('view-markers').addEventListener('click',
+          () => this.setViewMode('markers'));
+
+        document.getElementById('view-heatmap').addEventListener('click',
+          () => this.setViewMode('heatmap'));
+
+        // Function buttons
+        document.getElementById('locate-user').addEventListener('click',
+          () => this.locateUser());
+
+        document.getElementById('timeline-toggle').addEventListener('click',
+          () => this.toggleTimeline());
+
+        document.getElementById('refresh-data').addEventListener('click',
+          () => this.refreshData());
+
+        // Floating action buttons
+        document.getElementById('fullscreen-toggle').addEventListener('click',
+          () => this.toggleFullscreen());
+
+        document.getElementById('stats-toggle').addEventListener('click',
+          () => this.toggleStats());
+
+        // Panel controls
+        document.getElementById('legend-close').addEventListener('click',
+          () => this.hideLegend());
+
+        document.getElementById('stats-close').addEventListener('click',
+          () => this.hideStats());
+
+        // Timeline controls
+        document.getElementById('timeline-play').addEventListener('click',
+          () => this.playTimeline());
+
+        document.getElementById('timeline-pause').addEventListener('click',
+          () => this.pauseTimeline());
+
+        document.getElementById('timeline-close').addEventListener('click',
+          () => this.hideTimeline());
+
+        document.getElementById('timeline-slider').addEventListener('input',
+          (e) => this.updateTimelineHour(parseInt(e.target.value)));
+
+        // RSS filter
+        document.getElementById('rss-filter').addEventListener('input',
+          Utils.debounce(() => this.filterRSSItems(), 200));
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
+      }
+
+      async loadInitialData() {
+        Utils.showLoading('Laddar polisdata...');
+
+        try {
+          // Load both events and stations in parallel
+          const [eventsData, stationsData] = await Promise.allSettled([
+            this.loadPoliceEvents(),
+            this.loadPoliceStations()
+          ]);
+
+          if (eventsData.status === 'rejected') {
+            console.error('Failed to load events:', eventsData.reason);
+            Utils.showToast('Kunde inte ladda polishändelser', 4000, 'error');
+          }
+
+          if (stationsData.status === 'rejected') {
+            console.error('Failed to load stations:', stationsData.reason);
+            Utils.showToast('Kunde inte ladda polisstationer', 4000, 'warning');
+          }
+
+          // Load RSS feed (non-critical)
+          this.loadRSSFeed().catch(error => {
+            console.warn('RSS feed failed:', error);
+          });
+
+        } finally {
+          Utils.hideLoading();
+        }
+      }
+
+      async loadPoliceEvents() {
+        try {
+          // Try to load cached events first
+          const cachedEvents = await DataStorage.getRecentEvents();
+
+          if (cachedEvents.length > 0) {
+            // Recreate event objects from cached data
+            this.state.events = cachedEvents.map(data => {
+              const event = Object.create(PoliceEvent.prototype);
+              return Object.assign(event, data);
+            });
+
+            // Immediately show cached events on map
+            this.applyFilters();
+            this.updateEventTypeSelect();
+            this.renderEvents(); // Force immediate rendering
+            Utils.showToast(`Laddade ${this.state.events.length} cachade händelser`, 2000, 'success');
+          }
+
+          // Fetch fresh data from API
+          const response = await Utils.fetchWithRetry('https://polisen.se/api/events');
+          const rawEvents = await Utils.safeJsonParse(response);
+
+          if (!Array.isArray(rawEvents)) {
+            throw new Error('Ogiltig data från Polisen API');
+          }
+
+          // Parse events
+          const events = rawEvents
+            .map(raw => new PoliceEvent(raw))
+            .filter(event => event.isValidEvent())
+            .sort((a, b) => b.timeMs - a.timeMs)
+            .slice(0, this.state.maxEvents);
+
+          // Merge with cached events and deduplicate
+          const eventMap = new Map();
+
+          // Add cached events first
+          cachedEvents.forEach(event => eventMap.set(event.id, event));
+
+          // Add fresh events (will overwrite cached events with same ID)
+          events.forEach(event => eventMap.set(event.id, event));
+
+          // Convert back to array and sort
+          this.state.events = Array.from(eventMap.values())
+            .sort((a, b) => b.timeMs - a.timeMs)
+            .slice(0, this.state.maxEvents);
+
+          // Cache new events
+          await DataStorage.saveEvents(events);
+
+          // Update UI immediately
+          this.applyFilters();
+          this.updateEventTypeSelect();
+          this.renderEvents(); // Force immediate rendering of new data
+
+          Utils.showToast(`Uppdaterade med ${this.state.events.length} polishändelser`, 2000, 'success');
+
+        } catch (error) {
+          console.error('Error loading police events:', error);
+          throw error;
+        }
+      }
+
+      async loadPoliceStations() {
+        try {
+          // Try cached stations first
+          const cachedStations = await DataStorage.getAllStations();
+
+          if (cachedStations.length > 0) {
+            this.state.stations = cachedStations.map(data => {
+              const station = Object.create(PoliceStation.prototype);
+              return Object.assign(station, data);
+            });
+
+            this.renderStations();
+            Utils.showToast(`Laddade ${this.state.stations.length} cachade polisstationer`, 2000, 'success');
+          }
+
+          // Fetch fresh data
+          const response = await Utils.fetchWithRetry('https://polisen.se/api/policestations');
+          const rawStations = await Utils.safeJsonParse(response);
+
+          if (!Array.isArray(rawStations)) {
+            throw new Error('Ogiltig data från Polisstationer API');
+          }
+
+          // Parse stations
+          const stations = rawStations
+            .map(raw => new PoliceStation(raw))
+            .filter(station => station.isValidStation());
+
+          this.state.stations = stations;
+
+          // Cache stations
+          await DataStorage.saveStations(stations);
+
+          // Render stations
+          this.renderStations();
+
+          Utils.showToast(`Laddade ${stations.length} polisstationer`, 2000, 'success');
+
+        } catch (error) {
+          console.error('Error loading police stations:', error);
+          throw error;
+        }
+      }
+
+      async loadRSSFeed() {
+        try {
+          const rssSources = [
+            'https://polisen.se/aktuellt/rss/',
+            'https://api.allorigins.win/get?url=' + encodeURIComponent('https://polisen.se/aktuellt/rss/'),
+            'https://polisen.se/aktuellt/handelser/rss/'
+          ];
+
+          let rssContent = '';
+
+          for (const source of rssSources) {
+            try {
+              if (source.includes('allorigins')) {
+                const response = await Utils.fetchWithRetry(source);
+                const data = await Utils.safeJsonParse(response);
+                rssContent = data.contents || '';
+              } else {
+                const response = await Utils.fetchWithRetry(source);
+                rssContent = await response.text();
+              }
+
+              if (rssContent && rssContent.trim().length > 100) {
+                break;
+              }
+            } catch (error) {
+              console.warn(`RSS source ${source} failed:`, error);
+            }
+          }
+
+          if (!rssContent || rssContent.trim().length < 100) {
+            // Use fallback data for demonstration
+            this.state.rssItems = [
+              {
+                title: 'Polisen informerar om trafiksäkerhet',
+                link: '#',
+                pubDate: new Date().toISOString(),
+                description: 'Viktiga säkerhetsåtgärder under vinterförhållanden',
+                location: 'Nationellt'
+              },
+              {
+                title: 'Större polisinsats i centrala Stockholm',
+                link: '#',
+                pubDate: new Date(Date.now() - 3600000).toISOString(),
+                description: 'Polisen genomför kontroller i city',
+                location: 'Stockholm'
+              },
+              {
+                title: 'Varning för telefonbedrägerier',
+                link: '#',
+                pubDate: new Date(Date.now() - 7200000).toISOString(),
+                description: 'Ökat antal anmälningar om falska poliser',
+                location: 'Nationellt'
+              }
+            ];
+          } else {
+            this.parseRSSFeed(rssContent);
+          }
+
+          this.renderRSSItems();
+
+        } catch (error) {
+          console.warn('RSS feed error:', error);
+          // Fallback data already set above
+        }
+      }
+
+      parseRSSFeed(xmlContent) {
+        try {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+          const items = xmlDoc.querySelectorAll('item');
+
+          this.state.rssItems = Array.from(items).slice(0, 30).map(item => {
+            const title = item.querySelector('title')?.textContent || '';
+            const link = item.querySelector('link')?.textContent || '#';
+            const description = item.querySelector('description')?.textContent || '';
+            const pubDate = item.querySelector('pubDate')?.textContent || '';
+
+            // Extract location from title or description
+            const locationMatch = (title + ' ' + description).match(
+              /(?:i|från|vid)\s+([A-ZÅÄÖ][a-zåäö]+(?:\s+[A-ZÅÄÖ][a-zåäö]+)?)/
+            );
+            const location = locationMatch ? locationMatch[1] : 'Okänd plats';
+
+            return {
+              title: Utils.sanitizeHTML(title),
+              link,
+              description: Utils.sanitizeHTML(description),
+              pubDate,
+              location: Utils.sanitizeHTML(location),
+              formattedDate: this.formatRSSDate(pubDate)
+            };
+          });
+
+        } catch (error) {
+          console.error('RSS parsing error:', error);
+          this.state.rssItems = [];
+        }
+      }
+
+      formatRSSDate(dateString) {
+        try {
+          const date = new Date(dateString);
+          return Utils.formatDate(date);
+        } catch {
+          return dateString;
+        }
+      }
+
+      updateMaxEvents() {
+        const input = document.getElementById('max-events');
+        const value = Math.max(50, Math.min(1000, parseInt(input.value) || 500));
+
+        input.value = value;
+        this.state.maxEvents = value;
+
+        // Re-slice events to new limit
+        this.state.events = this.state.events.slice(0, value);
+        this.applyFilters();
+      }
+
+      updateTypeFilter() {
+        const select = document.getElementById('event-type');
+        this.state.filters.types = Array.from(select.selectedOptions).map(option => option.value);
+        this.applyFilters();
+      }
+
+      updateSearchFilter() {
+        const input = document.getElementById('search-query');
+        this.state.filters.searchQuery = input.value.toLowerCase().trim();
+        this.applyFilters();
+      }
+
+      updateTimelineHour(hour) {
+        this.state.filters.timelineHour = hour;
+        this.state.ui.timeline.currentHour = hour;
+
+        document.getElementById('timeline-time').textContent =
+          `${String(hour).padStart(2, '0')}:00`;
+
+        this.applyFilters();
+      }
+
+      applyFilters() {
+        let filtered = [...this.state.events];
+
+        // Type filter
+        if (this.state.filters.types.length > 0) {
+          filtered = filtered.filter(event =>
+            this.state.filters.types.includes(event.type)
+          );
+        }
+
+        // Search filter
+        if (this.state.filters.searchQuery) {
+          const query = this.state.filters.searchQuery;
+          filtered = filtered.filter(event =>
+            event.title.toLowerCase().includes(query) ||
+            event.description.toLowerCase().includes(query) ||
+            event.city.toLowerCase().includes(query) ||
+            event.type.toLowerCase().includes(query)
+          );
+        }
+
+        // Timeline hour filter
+        if (this.state.filters.timelineHour !== null) {
+          filtered = filtered.filter(event => {
+            const eventHour = event.timestamp.getHours();
+            return eventHour === this.state.filters.timelineHour;
+          });
+        }
+
+        this.state.filteredEvents = filtered;
+        this.renderEvents();
+        this.updateLegend();
+        this.updateCharts();
+      }
+
+      setViewMode(mode) {
+        this.state.currentView = mode;
+
+        // Update button states
+        document.getElementById('view-markers').classList.toggle('active', mode === 'markers');
+        document.getElementById('view-heatmap').classList.toggle('active', mode === 'heatmap');
+
+        this.renderEvents();
+      }
+
+      renderEvents() {
+        // Clear existing event layers
+        if (this.state.layers.eventCluster) {
+          this.state.map.removeLayer(this.state.layers.eventCluster);
+          this.state.layers.eventCluster.clearLayers();
+        }
+
+        if (this.state.layers.heatLayer) {
+          this.state.map.removeLayer(this.state.layers.heatLayer);
+          this.state.layers.heatLayer = null;
+        }
+
+        if (this.state.currentView === 'heatmap') {
+          this.renderHeatmap();
+        } else {
+          this.renderMarkers();
+        }
+      }
+
+      renderMarkers() {
+        const zoom = this.state.map.getZoom();
+        const baseRadius = Math.max(6, Math.min(14, zoom - 2));
+
+        this.state.filteredEvents.forEach(event => {
+          const severityColor = event.severityInfo.color;
+
+          const marker = L.circleMarker([event.lat, event.lng], {
+            radius: baseRadius + (event.exactLocation ? 2 : 0),
+            color: '#ffffff',
+            fillColor: severityColor,
+            fillOpacity: event.exactLocation ? 0.9 : 0.75,
+            weight: event.exactLocation ? 2 : 1.5,
+            className: `crime-marker ${event.exactLocation ? 'exact-location' : 'approximate-location'}`,
+            zIndexOffset: 1000 // Above police stations
+          });
+
+          marker.bindPopup(event.getPopupContent(), {
+            maxWidth: 320,
+            className: 'crime-event-popup'
+          });
+
+          this.state.layers.eventCluster.addLayer(marker);
+        });
+
+        this.state.layers.eventCluster.addTo(this.state.map);
+      }
+
+      renderHeatmap() {
+        const heatPoints = this.state.filteredEvents.map(event => [
+          event.lat,
+          event.lng,
+          Math.max(0.3, event.severityInfo.level / 5) // Intensity based on severity
+        ]);
+
+        const zoom = this.state.map.getZoom();
+        const radius = Math.max(15, Math.min(50, zoom * 3));
+
+        this.state.layers.heatLayer = L.heatLayer(heatPoints, {
+          radius: radius,
+          blur: 20,
+          maxZoom: 15,
+          minOpacity: 0.4,
+          gradient: {
+            0.0: '#22c55e',
+            0.2: '#f59e0b',
+            0.4: '#f97316',
+            0.6: '#dc2626',
+            0.8: '#991b1b',
+            1.0: '#7f1d1d'
+          }
+        });
+
+        this.state.layers.heatLayer.addTo(this.state.map);
+      }
+
+      renderStations() {
+        // Clear existing station markers
+        this.state.layers.stationCluster.clearLayers();
+
+        this.state.stations.forEach(station => {
+          const marker = station.createMarker();
+          if (marker) {
+            this.state.layers.stationCluster.addLayer(marker);
+          }
+        });
+      }
+
+      updateEventTypeSelect() {
+        const select = document.getElementById('event-type');
+        const currentValues = Array.from(select.selectedOptions).map(o => o.value);
+
+        // Get unique types and sort them
+        const types = [...new Set(this.state.events.map(event => event.type))].sort();
+
+        // Clear and rebuild options
+        select.innerHTML = '';
+
+        types.forEach(type => {
+          const option = document.createElement('option');
+          option.value = type;
+          option.textContent = type;
+          option.selected = currentValues.includes(type);
+          select.appendChild(option);
+        });
+
+        // Set reasonable size
+        select.size = Math.min(6, Math.max(1, types.length));
+      }
+
+      updateLegend() {
+        const statsEl = document.getElementById('legend-stats');
+        const itemsEl = document.getElementById('legend-items');
+
+        const total = this.state.filteredEvents.length;
+        const exactCount = this.state.filteredEvents.filter(e => e.exactLocation).length;
+        const approxCount = total - exactCount;
+
+        statsEl.innerHTML = `
+          <div style="margin-bottom: 8px;">
+            <strong>${total}</strong> händelser visas
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-muted);">
+            Exakt position: ${exactCount} | Ungefärlig: ${approxCount}
+          </div>
+        `;
+
+        // Count by type
+        const typeCounts = {};
+        this.state.filteredEvents.forEach(event => {
+          typeCounts[event.type] = (typeCounts[event.type] || 0) + 1;
+        });
+
+        // Get top 6 most common types
+        const topTypes = Object.entries(typeCounts)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 6);
+
+        itemsEl.innerHTML = topTypes.map(([type, count]) => {
+          const color = CrimeSeveritySystem.getSeverityColor(type);
+          return `
+            <div class="legend-item">
+              <div class="legend-dot" style="background: ${color}"></div>
+              <span>${type} (${count})</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      updateMarkerSizes() {
+        if (this.state.currentView === 'markers') {
+          this.renderEvents(); // Re-render with new sizes
+        }
+      }
+
+      updateVisibleStats() {
+        // Update any statistics that depend on current map view
+        this.updateLegend();
+      }
+
+      updateCharts() {
+        if (this.state.ui.statsVisible) {
+          this.renderTimelineChart();
+          this.renderTypeChart();
+        }
+      }
+
+      renderTimelineChart() {
+        const canvas = document.getElementById('timeline-chart');
+        const ctx = canvas.getContext('2d');
+
+        // Destroy existing chart
+        if (this.state.charts.timeline) {
+          this.state.charts.timeline.destroy();
+        }
+
+        // Group events by hour
+        const hourCounts = new Array(24).fill(0);
+        this.state.filteredEvents.forEach(event => {
+          const hour = event.timestamp.getHours();
+          hourCounts[hour]++;
+        });
+
+        this.state.charts.timeline = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: Array.from({length: 24}, (_, i) => `${String(i).padStart(2, '0')}:00`),
+            datasets: [{
+              label: 'Antal händelser',
+              data: hourCounts,
+              borderColor: 'var(--color-primary)',
+              backgroundColor: 'rgba(30, 64, 175, 0.1)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  precision: 0
+                }
+              }
+            }
+          }
+        });
+      }
+
+      renderTypeChart() {
+        const canvas = document.getElementById('type-chart');
+        const ctx = canvas.getContext('2d');
+
+        // Destroy existing chart
+        if (this.state.charts.types) {
+          this.state.charts.types.destroy();
+        }
+
+        // Count by type
+        const typeCounts = {};
+        this.state.filteredEvents.forEach(event => {
+          typeCounts[event.type] = (typeCounts[event.type] || 0) + 1;
+        });
+
+        const sortedTypes = Object.entries(typeCounts)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 8); // Top 8 types
+
+        const labels = sortedTypes.map(([type]) => type);
+        const data = sortedTypes.map(([,count]) => count);
+        const colors = labels.map(type => CrimeSeveritySystem.getSeverityColor(type));
+
+        this.state.charts.types = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: data,
+              backgroundColor: colors,
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  boxWidth: 12,
+                  padding: 10,
+                  font: {
+                    size: 11
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      renderRSSItems() {
+        const container = document.getElementById('rss-items');
+        const filter = document.getElementById('rss-filter').value.toLowerCase();
+
+        const filteredItems = (this.state.rssItems || []).filter(item => {
+          if (!filter) return true;
+          return item.title.toLowerCase().includes(filter) ||
+                 item.description.toLowerCase().includes(filter) ||
+                 item.location.toLowerCase().includes(filter);
+        });
+
+        container.innerHTML = filteredItems.map(item => `
+          <div style="border-bottom: 1px solid var(--border-light); padding: 12px 0;">
+            <h5 style="margin: 0 0 6px; font-size: 0.875rem;">
+              <a href="${item.link}" target="_blank" style="color: var(--color-primary); text-decoration: none;">
+                ${item.title}
+              </a>
+            </h5>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">
+              📍 ${item.location} • 🕒 ${item.formattedDate}
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+              ${item.description}
+            </div>
+          </div>
+        `).join('');
+
+        if (filteredItems.length === 0) {
+          container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-muted);">Inga nyheter matchar sökningen</div>';
+        }
+      }
+
+      filterRSSItems() {
+        this.renderRSSItems();
+      }
+
+      async locateUser() {
+        if (!navigator.geolocation) {
+          Utils.showToast('Geolokalisering stöds inte i denna webbläsare', 4000, 'error');
+          return;
+        }
+
+        Utils.showLoading('Lokaliserar din position...');
+
+        try {
+          const position = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+              resolve,
+              reject,
+              {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 300000 // 5 minutes
+              }
+            );
+          });
+
+          const { latitude, longitude } = position.coords;
+          this.state.userLocation = [latitude, longitude];
+
+          // Add user location marker
+          if (this.state.userLocationMarker) {
+            this.state.map.removeLayer(this.state.userLocationMarker);
+          }
+
+          this.state.userLocationMarker = L.marker([latitude, longitude], {
+            icon: L.divIcon({
+              className: 'user-location-marker',
+              html: '<div style="background: var(--color-primary); color: white; border: 3px solid white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: var(--shadow-md);">📍</div>',
+              iconSize: [20, 20],
+              iconAnchor: [10, 10]
+            })
+          });
+
+          this.state.userLocationMarker.addTo(this.state.map);
+          this.state.map.setView([latitude, longitude], 12);
+
+          Utils.showToast('Position hittad! Kartan centrerad på din plats', 3000, 'success');
+
+        } catch (error) {
+          console.error('Geolocation error:', error);
+          Utils.showToast('Kunde inte hämta din position. Kontrollera behörigheter', 4000, 'error');
+        } finally {
+          Utils.hideLoading();
+        }
+      }
+
+      toggleTimeline() {
+        this.state.ui.timelineVisible = !this.state.ui.timelineVisible;
+        const panel = document.getElementById('timeline-panel');
+        panel.style.display = this.state.ui.timelineVisible ? 'block' : 'none';
+
+        if (this.state.ui.timelineVisible) {
+          // Reset timeline state
+          this.state.filters.timelineHour = null;
+          this.state.ui.timeline.currentHour = 0;
+          document.getElementById('timeline-slider').value = 0;
+          document.getElementById('timeline-time').textContent = '00:00';
+          this.applyFilters();
+        } else {
+          this.hideTimeline();
+        }
+      }
+
+      hideTimeline() {
+        this.state.ui.timelineVisible = false;
+        this.state.filters.timelineHour = null;
+
+        if (this.state.ui.timeline.playing) {
+          this.pauseTimeline();
+        }
+
+        document.getElementById('timeline-panel').style.display = 'none';
+        this.applyFilters();
+      }
+
+      playTimeline() {
+        if (this.state.ui.timeline.playing) return;
+
+        this.state.ui.timeline.playing = true;
+
+        this.state.ui.timeline.timer = setInterval(() => {
+          this.state.ui.timeline.currentHour = (this.state.ui.timeline.currentHour + 1) % 24;
+
+          document.getElementById('timeline-slider').value = this.state.ui.timeline.currentHour;
+          this.updateTimelineHour(this.state.ui.timeline.currentHour);
+
+          if (this.state.ui.timeline.currentHour === 23) {
+            // Auto-pause at end of day
+            setTimeout(() => this.pauseTimeline(), 1000);
+          }
+        }, 1500); // 1.5 seconds per hour
+
+        document.getElementById('timeline-play').textContent = 'Spelar...';
+      }
+
+      pauseTimeline() {
+        if (this.state.ui.timeline.timer) {
+          clearInterval(this.state.ui.timeline.timer);
+          this.state.ui.timeline.timer = null;
+        }
+
+        this.state.ui.timeline.playing = false;
+        document.getElementById('timeline-play').textContent = 'Spela';
+      }
+
+      async refreshData() {
+        Utils.showLoading('Uppdaterar data...');
+
+        try {
+          await this.loadPoliceEvents();
+          await this.loadPoliceStations();
+          await this.loadRSSFeed();
+
+          Utils.showToast('Data har uppdaterats framgångsrikt', 3000, 'success');
+
+        } catch (error) {
+          console.error('Refresh error:', error);
+          Utils.showToast('Ett fel uppstod vid uppdatering av data', 4000, 'error');
+        } finally {
+          Utils.hideLoading();
+        }
+      }
+
+      toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().then(() => {
+            Utils.showToast('Fullskärmsläge aktiverat', 2000, 'success');
+          }).catch(() => {
+            Utils.showToast('Kunde inte aktivera fullskärm', 3000, 'error');
+          });
+        } else {
+          document.exitFullscreen().then(() => {
+            Utils.showToast('Fullskärmsläge avaktiverat', 2000, 'info');
+          });
+        }
+      }
+
+      toggleStats() {
+        this.state.ui.statsVisible = !this.state.ui.statsVisible;
+        const panel = document.getElementById('stats-panel');
+        panel.style.display = this.state.ui.statsVisible ? 'block' : 'none';
+
+        if (this.state.ui.statsVisible) {
+          // Render charts when panel is shown
+          setTimeout(() => {
+            this.renderTimelineChart();
+            this.renderTypeChart();
+            this.renderRSSItems();
+          }, 100);
+        }
+      }
+
+      hideStats() {
+        this.state.ui.statsVisible = false;
+        document.getElementById('stats-panel').style.display = 'none';
+      }
+
+      hideLegend() {
+        document.getElementById('legend').style.display = 'none';
+      }
+
+      handleKeyboardShortcuts(event) {
+        // Only handle shortcuts if no input is focused
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') {
+          return;
+        }
+
+        switch (event.key) {
+          case 'r':
+          case 'R':
+            event.preventDefault();
+            this.refreshData();
+            break;
+
+          case 'f':
+          case 'F':
+            event.preventDefault();
+            this.toggleFullscreen();
+            break;
+
+          case 's':
+          case 'S':
+            event.preventDefault();
+            this.toggleStats();
+            break;
+
+          case 't':
+          case 'T':
+            event.preventDefault();
+            this.toggleTimeline();
+            break;
+
+          case 'l':
+          case 'L':
+            event.preventDefault();
+            this.locateUser();
+            break;
+
+          case 'm':
+          case 'M':
+            event.preventDefault();
+            this.setViewMode(this.state.currentView === 'markers' ? 'heatmap' : 'markers');
+            break;
+
+          case 'Escape':
+            event.preventDefault();
+            if (this.state.ui.statsVisible) this.hideStats();
+            if (this.state.ui.timelineVisible) this.hideTimeline();
+            break;
+        }
+      }
+
+      updateUI() {
+        // Update any UI elements that need initial setup
+        this.updateLegend();
+
+        // Set up service worker for offline functionality
+        this.registerServiceWorker();
+
+        // Add keyboard shortcut info to tooltips
+        this.updateTooltips();
+      }
+
+      updateTooltips() {
+        const shortcuts = {
+          'refresh-data': 'Uppdatera (R)',
+          'fullscreen-toggle': 'Fullskärm (F)',
+          'stats-toggle': 'Statistik (S)',
+          'timeline-toggle': 'Tidslinje (T)',
+          'locate-user': 'Min position (L)',
+          'view-markers': 'Markörer (M)',
+          'view-heatmap': 'Värmekarta (M)'
+        };
+
+        Object.entries(shortcuts).forEach(([id, tooltip]) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.title = tooltip;
+          }
+        });
+      }
+
+      async registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+          try {
+            await navigator.serviceWorker.register('/police-sw.js');
+            console.log('Service Worker registered successfully');
+          } catch (error) {
+            console.warn('Service Worker registration failed:', error);
+          }
+        }
+      }
+    }
+
+    // ===== APPLICATION INITIALIZATION =====
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize the application
+      window.policeEventsApp = new PoliceEventsApp();
+
+      // Global error handler
+      window.addEventListener('error', (event) => {
+        console.error('Global error:', event.error);
+        Utils.showToast('Ett oväntat fel uppstod', 4000, 'error');
+      });
+
+      // Handle unhandled promise rejections
+      window.addEventListener('unhandledrejection', (event) => {
+        console.error('Unhandled promise rejection:', event.reason);
+        Utils.showToast('Ett fel uppstod vid datahantering', 4000, 'error');
+      });
+    });
+
+  </script>
 </body>
 </html>
