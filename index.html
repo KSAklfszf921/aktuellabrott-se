@@ -1864,7 +1864,15 @@
         const fullAddress = this.address !== this.city ? this.address : this.city;
 
         return `
-          <div style="min-width: 260px; font-family: inherit; line-height: 1.5;">
+          <div style="min-width: 260px; font-family: inherit; line-height: 1.5; position: relative;">
+            <button
+              type="button"
+              class="favorite-star-btn"
+              data-event-id="${Utils.sanitizeHTML(this.id)}"
+              aria-label="Spara händelsen som favorit"
+              aria-pressed="false"
+              title="Spara som favorit"
+            >☆</button>
             <h3 style="margin: 0 0 12px; color: var(--text-primary); font-size: 1rem; border-bottom: 2px solid ${severityColor}; padding-bottom: 6px;">
               ${Utils.sanitizeHTML(this.title)}
             </h3>
@@ -2313,6 +2321,9 @@
           // Initialize storage
           await DataStorage.initialize();
 
+          // Load stored favorites before rendering UI
+          await this.initializeFavorites();
+
           // Initialize map first
           this.initializeMap();
 
@@ -2331,6 +2342,341 @@
           console.error('Initialization error:', error);
           Utils.showToast('Fel vid initialisering av kartan', 5000, 'error');
         }
+      }
+
+      async initializeFavorites() {
+        try {
+          const [eventFavorites, locationFavorites] = await Promise.all([
+            DataStorage.getFavorites('event'),
+            DataStorage.getFavorites('location')
+          ]);
+
+          const sortBySavedAt = (a, b) => {
+            const aTime = a?.savedAt ? new Date(a.savedAt).getTime() : 0;
+            const bTime = b?.savedAt ? new Date(b.savedAt).getTime() : 0;
+            return bTime - aTime;
+          };
+
+          this.state.favorites.events = (eventFavorites || []).sort(sortBySavedAt);
+          this.state.favorites.locations = (locationFavorites || []).sort(sortBySavedAt);
+
+          this.refreshFavoritesUI();
+        } catch (error) {
+          console.error('Failed to load favorites:', error);
+        }
+      }
+
+      refreshFavoritesUI() {
+        const eventsContainer = document.getElementById('favorites-events-content');
+        const eventsEmpty = document.getElementById('favorites-events-empty');
+        const locationsContainer = document.getElementById('favorites-locations-content');
+        const locationsEmpty = document.getElementById('favorites-locations-empty');
+
+        if (!eventsContainer || !locationsContainer) {
+          return;
+        }
+
+        const ensureListContainer = (container, listId) => {
+          let listEl = container.querySelector(`#${listId}`);
+          if (!listEl) {
+            listEl = document.createElement('div');
+            listEl.id = listId;
+            listEl.style.display = 'flex';
+            listEl.style.flexDirection = 'column';
+            listEl.style.gap = 'var(--spacing-sm)';
+            container.appendChild(listEl);
+          }
+          return listEl;
+        };
+
+        const renderFavorites = (listEl, emptyEl, favorites) => {
+          if (!listEl || !emptyEl) return;
+
+          listEl.innerHTML = '';
+
+          if (!favorites || favorites.length === 0) {
+            emptyEl.style.display = 'block';
+            listEl.style.display = 'none';
+            return;
+          }
+
+          emptyEl.style.display = 'none';
+          listEl.style.display = 'flex';
+
+          favorites.forEach(favorite => {
+            const itemEl = this.createFavoriteItemElement(favorite);
+            if (itemEl) {
+              listEl.appendChild(itemEl);
+            }
+          });
+        };
+
+        const sortedEvents = [...(this.state.favorites.events || [])].sort((a, b) => {
+          const aTime = a?.savedAt ? new Date(a.savedAt).getTime() : 0;
+          const bTime = b?.savedAt ? new Date(b.savedAt).getTime() : 0;
+          return bTime - aTime;
+        });
+
+        const sortedLocations = [...(this.state.favorites.locations || [])].sort((a, b) => {
+          const aTime = a?.savedAt ? new Date(a.savedAt).getTime() : 0;
+          const bTime = b?.savedAt ? new Date(b.savedAt).getTime() : 0;
+          return bTime - aTime;
+        });
+
+        const eventsList = ensureListContainer(eventsContainer, 'favorites-events-list');
+        const locationsList = ensureListContainer(locationsContainer, 'favorites-locations-list');
+
+        renderFavorites(eventsList, eventsEmpty, sortedEvents);
+        renderFavorites(locationsList, locationsEmpty, sortedLocations);
+
+        this.updateFavoritesCounts();
+      }
+
+      updateFavoritesCounts() {
+        const eventsCount = document.getElementById('favorites-count-events');
+        const locationsCount = document.getElementById('favorites-count-locations');
+
+        if (eventsCount) {
+          eventsCount.textContent = `(${this.state.favorites.events.length})`;
+        }
+
+        if (locationsCount) {
+          locationsCount.textContent = `(${this.state.favorites.locations.length})`;
+        }
+      }
+
+      createFavoriteItemElement(favorite) {
+        if (!favorite || !favorite.data) {
+          return null;
+        }
+
+        const data = favorite.data;
+        const itemEl = document.createElement('div');
+        itemEl.className = 'favorite-item';
+        itemEl.dataset.favoriteId = favorite.id;
+
+        const actionsEl = document.createElement('div');
+        actionsEl.className = 'favorite-item-actions';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'favorite-action-btn';
+        removeBtn.setAttribute('aria-label', 'Ta bort favorit');
+        removeBtn.textContent = '×';
+        removeBtn.addEventListener('click', (event) => {
+          event.stopPropagation();
+          this.removeFavorite(favorite.id);
+        });
+
+        actionsEl.appendChild(removeBtn);
+        itemEl.appendChild(actionsEl);
+
+        const header = document.createElement('div');
+        header.className = 'favorite-item-header';
+
+        const typeSpan = document.createElement('span');
+        typeSpan.className = 'favorite-item-type';
+        typeSpan.textContent = favorite.type === 'event'
+          ? (data.eventType || 'Händelse')
+          : (data.label || data.title || 'Plats');
+        header.appendChild(typeSpan);
+
+        const dateSpan = document.createElement('span');
+        dateSpan.className = 'favorite-item-date';
+        dateSpan.textContent = this.formatFavoriteDate(favorite);
+        header.appendChild(dateSpan);
+
+        itemEl.appendChild(header);
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'favorite-item-title';
+        titleEl.textContent = data.title || data.name || 'Favorit';
+        itemEl.appendChild(titleEl);
+
+        const locationText = favorite.type === 'event'
+          ? (data.address || data.city || '')
+          : (data.address || data.city || data.description || '');
+
+        if (locationText) {
+          const locationEl = document.createElement('div');
+          locationEl.className = 'favorite-item-location';
+          locationEl.textContent = locationText;
+          itemEl.appendChild(locationEl);
+        }
+
+        if (favorite.type === 'event' && data.lat && data.lng) {
+          itemEl.addEventListener('click', () => {
+            if (this.state.map) {
+              this.state.map.setView([data.lat, data.lng], Math.max(this.state.map.getZoom(), 12));
+            }
+          });
+        }
+
+        return itemEl;
+      }
+
+      formatFavoriteDate(favorite) {
+        if (!favorite) return '';
+
+        const data = favorite.data || {};
+
+        const fromTimeMs = data.timeMs ? new Date(data.timeMs) : null;
+        if (fromTimeMs && !isNaN(fromTimeMs)) {
+          return Utils.formatDate(fromTimeMs);
+        }
+
+        const fromTimestamp = data.timestamp
+          ? (data.timestamp instanceof Date ? data.timestamp : new Date(data.timestamp))
+          : null;
+        if (fromTimestamp && !isNaN(fromTimestamp)) {
+          return Utils.formatDate(fromTimestamp);
+        }
+
+        const fromSavedAt = favorite.savedAt ? new Date(favorite.savedAt) : null;
+        if (fromSavedAt && !isNaN(fromSavedAt)) {
+          return Utils.formatDate(fromSavedAt);
+        }
+
+        return 'Okänd tid';
+      }
+
+      isEventFavorited(eventId) {
+        return this.state.favorites.events.some(fav => fav.id === `event_${eventId}`);
+      }
+
+      async toggleFavoriteEvent(eventData) {
+        if (!eventData || !eventData.id) {
+          return;
+        }
+
+        const favoriteId = `event_${eventData.id}`;
+
+        try {
+          if (this.isEventFavorited(eventData.id)) {
+            await DataStorage.removeFavorite(favoriteId);
+            this.state.favorites.events = this.state.favorites.events.filter(fav => fav.id !== favoriteId);
+            this.refreshFavoritesUI();
+            Utils.showToast('Händelsen togs bort från favoriter', 2000, 'info');
+            this.updateOpenPopupFavoriteState(eventData.id);
+            return false;
+          }
+
+          const favoritePayload = {
+            type: 'event',
+            id: eventData.id,
+            title: eventData.title,
+            eventType: eventData.type,
+            city: eventData.city,
+            address: eventData.address,
+            description: eventData.description,
+            url: eventData.url,
+            timeMs: eventData.timeMs,
+            timestamp: eventData.timestamp instanceof Date ? eventData.timestamp.toISOString() : eventData.timestamp,
+            severityInfo: eventData.severityInfo,
+            exactLocation: eventData.exactLocation,
+            lat: eventData.lat,
+            lng: eventData.lng
+          };
+
+          const savedFavorite = await DataStorage.saveFavorite(favoritePayload);
+
+          this.state.favorites.events = [
+            savedFavorite,
+            ...this.state.favorites.events.filter(fav => fav.id !== savedFavorite.id)
+          ];
+
+          this.refreshFavoritesUI();
+          Utils.showToast('Händelsen sparades bland favoriter', 2000, 'success');
+          this.updateOpenPopupFavoriteState(eventData.id);
+          return true;
+        } catch (error) {
+          console.error('Failed to toggle favorite event:', error);
+          Utils.showToast('Kunde inte uppdatera favoriter', 3000, 'error');
+          return this.isEventFavorited(eventData.id);
+        }
+      }
+
+      async removeFavorite(id) {
+        if (!id) return;
+
+        try {
+          await DataStorage.removeFavorite(id);
+
+          this.state.favorites.events = this.state.favorites.events.filter(fav => fav.id !== id);
+          this.state.favorites.locations = this.state.favorites.locations.filter(fav => fav.id !== id);
+
+          this.refreshFavoritesUI();
+          Utils.showToast('Favoriten togs bort', 2000, 'info');
+
+          if (id.startsWith('event_')) {
+            this.updateOpenPopupFavoriteState(id.replace('event_', ''));
+          }
+        } catch (error) {
+          console.error('Failed to remove favorite:', error);
+          Utils.showToast('Kunde inte ta bort favoriten', 3000, 'error');
+        }
+      }
+
+      updateOpenPopupFavoriteState(eventId) {
+        if (!eventId) return;
+
+        const popupContent = document.querySelector('.leaflet-popup-content');
+        if (!popupContent) return;
+
+        const selectorId = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(eventId) : eventId;
+        const starButton = popupContent.querySelector(`.favorite-star-btn[data-event-id="${selectorId}"]`);
+
+        if (!starButton) {
+          return;
+        }
+
+        const isFavorited = this.isEventFavorited(eventId);
+        starButton.classList.toggle('favorited', isFavorited);
+        starButton.setAttribute('aria-pressed', isFavorited ? 'true' : 'false');
+        starButton.setAttribute('aria-label', isFavorited ? 'Ta bort händelsen från favoriter' : 'Spara händelsen som favorit');
+        starButton.setAttribute('title', isFavorited ? 'Ta bort från favoriter' : 'Spara som favorit');
+        starButton.textContent = isFavorited ? '★' : '☆';
+      }
+
+      onPopupOpen(event) {
+        const popup = event?.popup;
+        const marker = popup?._source;
+        const eventData = marker?._policeEventData;
+
+        if (!popup || !eventData) {
+          return;
+        }
+
+        const popupElement = popup.getElement();
+        if (!popupElement) {
+          return;
+        }
+
+        const starButton = popupElement.querySelector('.favorite-star-btn');
+        if (!starButton) {
+          return;
+        }
+
+        const eventId = eventData.id;
+        starButton.dataset.eventId = eventId;
+
+        const updateStarState = () => {
+          const isFavorited = this.isEventFavorited(eventId);
+          starButton.classList.toggle('favorited', isFavorited);
+          starButton.setAttribute('aria-pressed', isFavorited ? 'true' : 'false');
+          starButton.setAttribute('aria-label', isFavorited ? 'Ta bort händelsen från favoriter' : 'Spara händelsen som favorit');
+          starButton.setAttribute('title', isFavorited ? 'Ta bort från favoriter' : 'Spara som favorit');
+          starButton.textContent = isFavorited ? '★' : '☆';
+        };
+
+        updateStarState();
+
+        starButton.onclick = async (clickEvent) => {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          await this.toggleFavoriteEvent(eventData);
+          updateStarState();
+        };
       }
 
       initializeMap() {
@@ -2360,6 +2706,8 @@
         this.state.map.on('moveend', Utils.throttle(() => {
           this.updateVisibleStats();
         }, 300));
+
+        this.state.map.on('popupopen', (event) => this.onPopupOpen(event));
       }
 
       initializeMarkerClusters() {
@@ -2912,6 +3260,8 @@
             className: `crime-marker ${event.exactLocation ? 'exact-location' : 'approximate-location'}`,
             zIndexOffset: 1000 // Above police stations
           });
+
+          marker._policeEventData = event;
 
           marker.bindPopup(event.getPopupContent(), {
             maxWidth: 320,
