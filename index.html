@@ -2302,7 +2302,8 @@
           charts: {
             timeline: null,
             types: null
-          }
+          },
+          missingLocationCount: 0
         };
 
         this.initialize();
@@ -2792,6 +2793,7 @@
 
       applyFilters() {
         let filtered = [...this.state.events];
+        let missingLocationCount = 0;
 
         // Type filter
         if (this.state.filters.types.length > 0) {
@@ -2844,11 +2846,16 @@
           const maxDistance = this.state.filters.locationRadius;
 
           filtered = filtered.filter(event => {
-            if (!event.lat || !event.lng) return true; // Include events without coordinates
+            if (!event.lat || !event.lng) {
+              missingLocationCount++;
+              return false;
+            }
             const distance = this.calculateDistance(centerLat, centerLng, event.lat, event.lng);
             return distance <= maxDistance;
           });
         }
+
+        this.state.missingLocationCount = missingLocationCount;
 
         // Priority filter
         if (this.state.filters.priorityFilter) {
@@ -2993,14 +3000,25 @@
         const total = this.state.filteredEvents.length;
         const exactCount = this.state.filteredEvents.filter(e => e.exactLocation).length;
         const approxCount = total - exactCount;
+        const missingLocationCount = this.state.missingLocationCount || 0;
+        const locationFilterActive = Boolean(
+          this.state.filters.locationCenter && this.state.filters.locationRadius
+        );
+        const missingLocationNotice = (locationFilterActive && missingLocationCount > 0)
+          ? `<div style="margin-top: 8px; font-size: 0.7rem; color: var(--color-warning);">
+              ⚠️ ${missingLocationCount} händelse${missingLocationCount > 1 ? 'r' : ''} saknar position och
+              visas inte inom valt område
+            </div>`
+          : '';
 
         statsEl.innerHTML = `
           <div style="margin-bottom: 8px;">
-            <strong>${total}</strong> händelser visas
+            <strong>${total}</strong> filtrerade händelser visas
           </div>
           <div style="font-size: 0.7rem; color: var(--text-muted);">
             Exakt position: ${exactCount} | Ungefärlig: ${approxCount}
           </div>
+          ${missingLocationNotice}
         `;
 
         // Count by type
