@@ -1241,6 +1241,16 @@
     <button class="fab" id="fullscreen-toggle" aria-label="Fullskärm" title="Fullskärmsläge">
       ⛶
     </button>
+    <button
+      class="fab"
+      id="legend-toggle"
+      aria-label="Dölj legend"
+      aria-controls="legend"
+      aria-expanded="true"
+      title="Dölj legend"
+    >
+      ℹ️
+    </button>
     <button class="fab" id="stats-toggle" aria-label="Statistik" title="Visa statistik">
       📊
     </button>
@@ -1250,7 +1260,15 @@
   <div class="legend floating-panel" id="legend">
     <h3 class="legend-title">
       Översikt
-      <button class="btn-close" id="legend-close" aria-label="Stäng legend">×</button>
+      <button
+        class="btn-close"
+        id="legend-close"
+        aria-label="Stäng legend"
+        aria-controls="legend"
+        aria-expanded="true"
+      >
+        ×
+      </button>
     </h3>
     <div class="legend-stats" id="legend-stats">
       Laddar statistik...
@@ -1614,43 +1632,65 @@
     class CrimeSeveritySystem {
       static SEVERITY_MAPPING = {
         // Level 1 - Minor offenses (Muted Green)
-        'Trafikbrott': { level: 1, color: '#6b7280', description: 'Trafikbrott' },
-        'Fortkörning': { level: 1, color: '#6b7280', description: 'Fortkörning' },
-        'Parkering': { level: 1, color: '#6b7280', description: 'Parkeringsbrott' },
-        'Ordningslagen': { level: 1, color: '#6b7280', description: 'Ordningslagen' },
+        'Trafikbrott': { level: 1, color: '#6b7280', description: 'Trafikbrott', priority: 'low' },
+        'Fortkörning': { level: 1, color: '#6b7280', description: 'Fortkörning', priority: 'low' },
+        'Parkering': { level: 1, color: '#6b7280', description: 'Parkeringsbrott', priority: 'low' },
+        'Ordningslagen': { level: 1, color: '#6b7280', description: 'Ordningslagen', priority: 'low' },
 
         // Level 2 - Property crimes (Muted Yellow-Orange)
-        'Skadegörelse': { level: 2, color: '#a16207', description: 'Skadegörelse' },
-        'Stöld': { level: 2, color: '#92400e', description: 'Stöld' },
-        'Snatteri': { level: 2, color: '#92400e', description: 'Snatteri' },
-        'Bedrägeri': { level: 2, color: '#92400e', description: 'Bedrägeri' },
-        'Inbrott': { level: 2, color: '#78350f', description: 'Inbrott' },
+        'Skadegörelse': { level: 2, color: '#a16207', description: 'Skadegörelse', priority: 'medium' },
+        'Stöld': { level: 2, color: '#92400e', description: 'Stöld', priority: 'medium' },
+        'Snatteri': { level: 2, color: '#92400e', description: 'Snatteri', priority: 'medium' },
+        'Bedrägeri': { level: 2, color: '#92400e', description: 'Bedrägeri', priority: 'medium' },
+        'Inbrott': { level: 2, color: '#78350f', description: 'Inbrott', priority: 'medium' },
 
         // Level 3 - Drug crimes and serious property crimes (Muted Orange-Red)
-        'Narkotikabrott': { level: 3, color: '#a16207', description: 'Narkotikabrott' },
-        'Rattfylleri': { level: 3, color: '#a16207', description: 'Rattfylleri' },
-        'Rån': { level: 3, color: '#92400e', description: 'Rån' },
+        'Narkotikabrott': { level: 3, color: '#a16207', description: 'Narkotikabrott', priority: 'high' },
+        'Rattfylleri': { level: 3, color: '#a16207', description: 'Rattfylleri', priority: 'high' },
+        'Rån': { level: 3, color: '#92400e', description: 'Rån', priority: 'high' },
 
         // Level 4 - Violent crimes (Muted Red)
-        'Misshandel': { level: 4, color: '#7c2d12', description: 'Misshandel' },
-        'Våldtäkt': { level: 4, color: '#7c2d12', description: 'Våldtäkt' },
-        'Våld mot tjänsteman': { level: 4, color: '#7c2d12', description: 'Våld mot tjänsteman' },
-        'Olaga hot': { level: 4, color: '#7c2d12', description: 'Olaga hot' },
+        'Misshandel': { level: 4, color: '#7c2d12', description: 'Misshandel', priority: 'critical' },
+        'Våldtäkt': { level: 4, color: '#7c2d12', description: 'Våldtäkt', priority: 'critical' },
+        'Våld mot tjänsteman': { level: 4, color: '#7c2d12', description: 'Våld mot tjänsteman', priority: 'critical' },
+        'Olaga hot': { level: 4, color: '#7c2d12', description: 'Olaga hot', priority: 'critical' },
 
         // Level 5 - Most serious crimes (Dark Muted Red)
-        'Mord': { level: 5, color: '#78716c', description: 'Mord' },
-        'Dråp': { level: 5, color: '#78716c', description: 'Dråp' },
-        'Mordbrand': { level: 5, color: '#78716c', description: 'Mordbrand' },
-        'Brand': { level: 4, color: '#7c2d12', description: 'Brand' },
+        'Mord': { level: 5, color: '#78716c', description: 'Mord', priority: 'critical' },
+        'Dråp': { level: 5, color: '#78716c', description: 'Dråp', priority: 'critical' },
+        'Mordbrand': { level: 5, color: '#78716c', description: 'Mordbrand', priority: 'critical' },
+        'Brand': { level: 4, color: '#7c2d12', description: 'Brand', priority: 'critical' },
 
         // Default
-        'Övrigt': { level: 2, color: '#6b7280', description: 'Övrigt' }
+        'Övrigt': { level: 2, color: '#6b7280', description: 'Övrigt', priority: 'medium' }
       };
 
+      static getPriorityForLevel(level) {
+        if (typeof level !== 'number') return 'medium';
+        if (level >= 4) return 'critical';
+        if (level === 3) return 'high';
+        if (level === 2) return 'medium';
+        return 'low';
+      }
+
+      static ensurePriority(info = this.SEVERITY_MAPPING['Övrigt']) {
+        const baseInfo = info || this.SEVERITY_MAPPING['Övrigt'];
+        const priority = baseInfo.priority ?? this.getPriorityForLevel(baseInfo.level);
+
+        return {
+          ...baseInfo,
+          priority
+        };
+      }
+
       static getSeverityInfo(crimeType) {
+        if (!crimeType || typeof crimeType !== 'string') {
+          return this.ensurePriority();
+        }
+
         // Direct match
         if (this.SEVERITY_MAPPING[crimeType]) {
-          return this.SEVERITY_MAPPING[crimeType];
+          return this.ensurePriority(this.SEVERITY_MAPPING[crimeType]);
         }
 
         // Fuzzy matching for similar crime types
@@ -1658,7 +1698,7 @@
 
         for (const [key, value] of Object.entries(this.SEVERITY_MAPPING)) {
           if (lowerType.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerType)) {
-            return value;
+            return this.ensurePriority(value);
           }
         }
 
@@ -1676,12 +1716,12 @@
 
         for (const [keyword, severity] of Object.entries(crimeKeywords)) {
           if (lowerType.includes(keyword)) {
-            return severity;
+            return this.ensurePriority(severity);
           }
         }
 
         // Default fallback
-        return this.SEVERITY_MAPPING['Övrigt'];
+        return this.ensurePriority();
       }
 
       static getSeverityColor(crimeType) {
@@ -2131,6 +2171,7 @@
           transaction.oncomplete = () => resolve();
 
           events.forEach(event => {
+            const severityInfo = CrimeSeveritySystem.ensurePriority(event.severityInfo);
             const eventData = {
               id: event.id,
               timeMs: event.timeMs,
@@ -2143,7 +2184,7 @@
               lat: event.lat,
               lng: event.lng,
               exactLocation: event.exactLocation,
-              severityInfo: event.severityInfo,
+              severityInfo: { ...severityInfo },
               url: event.url
             };
             store.put(eventData);
@@ -2270,6 +2311,7 @@
       constructor() {
         this.state = {
           events: [],
+          allEvents: [],
           filteredEvents: [],
           stations: [],
           currentView: 'markers', // 'markers' | 'heatmap'
@@ -2288,10 +2330,12 @@
           layers: {
             eventCluster: null,
             stationCluster: null,
-            heatLayer: null
+            heatLayer: null,
+            locationCircle: null
           },
           ui: {
             loading: false,
+            legendVisible: true,
             statsVisible: false,
             timelineVisible: false,
             favoritesVisible: false,
@@ -2310,7 +2354,8 @@
           charts: {
             timeline: null,
             types: null
-          }
+          },
+          missingLocationCount: 0
         };
 
         this.initialize();
@@ -2329,6 +2374,9 @@
 
           // Bind event listeners
           this.bindEventListeners();
+
+          // Ensure legend visibility controls are in sync with state
+          this.setLegendVisibility(this.state.ui.legendVisible);
 
           // Load initial data and show immediately
           await this.loadInitialData();
@@ -2812,6 +2860,17 @@
         document.getElementById('fullscreen-toggle').addEventListener('click',
           () => this.toggleFullscreen());
 
+        const legendToggle = document.getElementById('legend-toggle');
+        if (legendToggle) {
+          legendToggle.addEventListener('click', () => {
+            if (this.state.ui.legendVisible) {
+              this.hideLegend();
+            } else {
+              this.showLegend();
+            }
+          });
+        }
+
         document.getElementById('stats-toggle').addEventListener('click',
           () => this.toggleStats());
 
@@ -2821,6 +2880,18 @@
 
         document.getElementById('stats-close').addEventListener('click',
           () => this.hideStats());
+
+        document.getElementById('favorites-toggle').addEventListener('click',
+          () => this.toggleFavorites());
+
+        document.getElementById('favorites-close').addEventListener('click',
+          () => this.hideFavorites());
+
+        document.getElementById('tab-events').addEventListener('click',
+          () => this.setFavoritesTab('events'));
+
+        document.getElementById('tab-locations').addEventListener('click',
+          () => this.setFavoritesTab('locations'));
 
         // Timeline controls
         document.getElementById('timeline-play').addEventListener('click',
@@ -2892,12 +2963,53 @@
           // Try to load cached events first
           const cachedEvents = await DataStorage.getRecentEvents();
 
+          let rehydratedCachedEvents = [];
+
           if (cachedEvents.length > 0) {
             // Recreate event objects from cached data
-            this.state.events = cachedEvents.map(data => {
+            rehydratedCachedEvents = cachedEvents.map(data => {
               const event = Object.create(PoliceEvent.prototype);
-              return Object.assign(event, data);
+              Object.assign(event, data);
+
+              if (!(event.timestamp instanceof Date)) {
+                event.timestamp = event.timestamp ? new Date(event.timestamp) : new Date(event.timeMs || Date.now());
+              }
+
+              if (typeof event.timeMs !== 'number') {
+                event.timeMs = event.timestamp ? event.timestamp.getTime() : Date.now();
+              }
+
+              if (typeof event.lat === 'string') {
+                event.lat = parseFloat(event.lat);
+              }
+
+              if (typeof event.lng === 'string') {
+                event.lng = parseFloat(event.lng);
+              }
+
+              if (!event.severityInfo) {
+                event.severityInfo = CrimeSeveritySystem.getSeverityInfo(event.type);
+              }
+
+              event.rawData = event.rawData || {
+                id: event.id,
+                datetime: event.timestamp instanceof Date ? event.timestamp.toISOString() : event.timestamp,
+                name: event.title,
+                summary: event.description,
+                url: event.url,
+                type: event.type,
+                location: {
+                  name: event.city,
+                  gps: Number.isFinite(event.lat) && Number.isFinite(event.lng) ? `${event.lat},${event.lng}` : null
+                }
+              };
+
+              return event;
             });
+
+            this.state.events = rehydratedCachedEvents;
+
+            this.state.allEvents = [...this.state.events];
 
             // Immediately show cached events on map
             this.applyFilters();
@@ -2918,22 +3030,22 @@
           const events = rawEvents
             .map(raw => new PoliceEvent(raw))
             .filter(event => event.isValidEvent())
-            .sort((a, b) => b.timeMs - a.timeMs)
-            .slice(0, this.state.maxEvents);
+            .sort((a, b) => b.timeMs - a.timeMs);
 
           // Merge with cached events and deduplicate
           const eventMap = new Map();
 
           // Add cached events first
-          cachedEvents.forEach(event => eventMap.set(event.id, event));
+          rehydratedCachedEvents.forEach(event => eventMap.set(event.id, event));
 
           // Add fresh events (will overwrite cached events with same ID)
           events.forEach(event => eventMap.set(event.id, event));
 
           // Convert back to array and sort
-          this.state.events = Array.from(eventMap.values())
-            .sort((a, b) => b.timeMs - a.timeMs)
-            .slice(0, this.state.maxEvents);
+          this.state.allEvents = Array.from(eventMap.values())
+            .sort((a, b) => b.timeMs - a.timeMs);
+
+          this.state.events = this.state.allEvents.slice(0, this.state.maxEvents);
 
           // Cache new events
           await DataStorage.saveEvents(events);
@@ -3111,8 +3223,8 @@
         input.value = value;
         this.state.maxEvents = value;
 
-        // Re-slice events to new limit
-        this.state.events = this.state.events.slice(0, value);
+        // Re-slice events from full dataset
+        this.state.events = this.state.allEvents.slice(0, value);
         this.applyFilters();
       }
 
@@ -3140,6 +3252,7 @@
 
       applyFilters() {
         let filtered = [...this.state.events];
+        let missingLocationCount = 0;
 
         // Type filter
         if (this.state.filters.types.length > 0) {
@@ -3192,11 +3305,16 @@
           const maxDistance = this.state.filters.locationRadius;
 
           filtered = filtered.filter(event => {
-            if (!event.lat || !event.lng) return true; // Include events without coordinates
+            if (!event.lat || !event.lng) {
+              missingLocationCount++;
+              return false;
+            }
             const distance = this.calculateDistance(centerLat, centerLng, event.lat, event.lng);
             return distance <= maxDistance;
           });
         }
+
+        this.state.missingLocationCount = missingLocationCount;
 
         // Priority filter
         if (this.state.filters.priorityFilter) {
@@ -3261,11 +3379,15 @@
             zIndexOffset: 1000 // Above police stations
           });
 
-          marker._policeEventData = event;
 
-          marker.bindPopup(event.getPopupContent(), {
             maxWidth: 320,
             className: 'crime-event-popup'
+          });
+
+          marker.on('popupopen', (popupEvent) => {
+            if (window.EnhancedEventPopup && typeof EnhancedEventPopup.attachPopupActions === 'function') {
+              EnhancedEventPopup.attachPopupActions(popupEvent.popup, event);
+            }
           });
 
           this.state.layers.eventCluster.addLayer(marker);
@@ -3343,14 +3465,25 @@
         const total = this.state.filteredEvents.length;
         const exactCount = this.state.filteredEvents.filter(e => e.exactLocation).length;
         const approxCount = total - exactCount;
+        const missingLocationCount = this.state.missingLocationCount || 0;
+        const locationFilterActive = Boolean(
+          this.state.filters.locationCenter && this.state.filters.locationRadius
+        );
+        const missingLocationNotice = (locationFilterActive && missingLocationCount > 0)
+          ? `<div style="margin-top: 8px; font-size: 0.7rem; color: var(--color-warning);">
+              ⚠️ ${missingLocationCount} händelse${missingLocationCount > 1 ? 'r' : ''} saknar position och
+              visas inte inom valt område
+            </div>`
+          : '';
 
         statsEl.innerHTML = `
           <div style="margin-bottom: 8px;">
-            <strong>${total}</strong> händelser visas
+            <strong>${total}</strong> filtrerade händelser visas
           </div>
           <div style="font-size: 0.7rem; color: var(--text-muted);">
             Exakt position: ${exactCount} | Ungefärlig: ${approxCount}
           </div>
+          ${missingLocationNotice}
         `;
 
         // Count by type
@@ -3642,6 +3775,55 @@
         document.getElementById('timeline-play').textContent = 'Spela';
       }
 
+      toggleFavorites() {
+        const panel = document.getElementById('favorites-panel');
+        if (!panel) return;
+
+        this.state.ui.favoritesVisible = !this.state.ui.favoritesVisible;
+        panel.style.display = this.state.ui.favoritesVisible ? 'flex' : 'none';
+
+        if (this.state.ui.favoritesVisible) {
+          this.setFavoritesTab(this.state.ui.favoritesActiveTab);
+        }
+      }
+
+      hideFavorites() {
+        const panel = document.getElementById('favorites-panel');
+        if (!panel) return;
+
+        this.state.ui.favoritesVisible = false;
+        panel.style.display = 'none';
+      }
+
+      setFavoritesTab(tab) {
+        if (!['events', 'locations'].includes(tab)) {
+          return;
+        }
+
+        this.state.ui.favoritesActiveTab = tab;
+
+        const eventsTab = document.getElementById('tab-events');
+        const locationsTab = document.getElementById('tab-locations');
+        const eventsContent = document.getElementById('favorites-events-content');
+        const locationsContent = document.getElementById('favorites-locations-content');
+
+        if (eventsTab) {
+          eventsTab.classList.toggle('active', tab === 'events');
+        }
+
+        if (locationsTab) {
+          locationsTab.classList.toggle('active', tab === 'locations');
+        }
+
+        if (eventsContent) {
+          eventsContent.style.display = tab === 'events' ? 'block' : 'none';
+        }
+
+        if (locationsContent) {
+          locationsContent.style.display = tab === 'locations' ? 'block' : 'none';
+        }
+      }
+
       async refreshData() {
         Utils.showLoading('Uppdaterar data...');
 
@@ -3694,8 +3876,35 @@
         document.getElementById('stats-panel').style.display = 'none';
       }
 
+      setLegendVisibility(isVisible) {
+        const legendEl = document.getElementById('legend');
+        if (!legendEl) return;
+
+        this.state.ui.legendVisible = isVisible;
+        legendEl.style.display = isVisible ? 'block' : 'none';
+        legendEl.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+
+        const toggleButton = document.getElementById('legend-toggle');
+        if (toggleButton) {
+          toggleButton.setAttribute('aria-expanded', isVisible ? 'true' : 'false');
+          toggleButton.setAttribute('aria-label', isVisible ? 'Dölj legend' : 'Visa legend');
+          toggleButton.title = isVisible ? 'Dölj legend' : 'Visa legend';
+          toggleButton.classList.toggle('active', isVisible);
+        }
+
+        const closeButton = document.getElementById('legend-close');
+        if (closeButton) {
+          closeButton.setAttribute('aria-expanded', isVisible ? 'true' : 'false');
+        }
+      }
+
+      showLegend() {
+        this.setLegendVisibility(true);
+        this.updateLegend();
+      }
+
       hideLegend() {
-        document.getElementById('legend').style.display = 'none';
+        this.setLegendVisibility(false);
       }
 
       handleKeyboardShortcuts(event) {
@@ -3782,7 +3991,7 @@
       async registerServiceWorker() {
         if ('serviceWorker' in navigator) {
           try {
-            await navigator.serviceWorker.register('/police-sw.js');
+            await navigator.serviceWorker.register('/sw.js');
             console.log('Service Worker registered successfully');
           } catch (error) {
             console.warn('Service Worker registration failed:', error);
@@ -3801,6 +4010,45 @@
         this.applyFilters();
       }
 
+      getZoomLevelForRadius(radiusKm) {
+        const numericRadius = typeof radiusKm === 'number' ? radiusKm : parseFloat(radiusKm);
+        const radius = Number.isFinite(numericRadius) ? numericRadius : 10;
+        if (radius <= 5) return 12;
+        if (radius <= 10) return 11;
+        if (radius <= 25) return 10;
+        if (radius <= 50) return 9;
+        if (radius <= 100) return 8;
+        return 7;
+      }
+
+      updateLocationCircle(lat, lng, radiusKm) {
+        if (!this.state.map) return;
+
+        const numericRadius = typeof radiusKm === 'number' ? radiusKm : parseFloat(radiusKm);
+        const safeRadiusKm = Number.isFinite(numericRadius) ? numericRadius : 0;
+        const radiusMeters = Math.max(0, safeRadiusKm) * 1000;
+
+        if (this.state.layers.locationCircle) {
+          this.state.layers.locationCircle.setLatLng([lat, lng]);
+          this.state.layers.locationCircle.setRadius(radiusMeters);
+        } else {
+          this.state.layers.locationCircle = L.circle([lat, lng], {
+            radius: radiusMeters,
+            color: '#2563eb',
+            weight: 2,
+            fillColor: '#2563eb',
+            fillOpacity: 0.15
+          }).addTo(this.state.map);
+        }
+      }
+
+      clearLocationCircle() {
+        if (this.state.layers.locationCircle && this.state.map) {
+          this.state.map.removeLayer(this.state.layers.locationCircle);
+        }
+        this.state.layers.locationCircle = null;
+      }
+
       updateLocationFilter() {
         const locationQuery = document.getElementById('location-search').value.trim();
         this.state.filters.locationRadius = parseInt(document.getElementById('distance-radius').value);
@@ -3809,6 +4057,7 @@
           this.geocodeLocation(locationQuery);
         } else {
           this.state.filters.locationCenter = null;
+          this.clearLocationCircle();
           this.applyFilters();
         }
       }
@@ -3824,10 +4073,19 @@
           const results = await response.json();
 
           if (results.length > 0) {
+            const lat = parseFloat(results[0].lat);
+            const lng = parseFloat(results[0].lon);
             this.state.filters.locationCenter = {
-              lat: parseFloat(results[0].lat),
-              lng: parseFloat(results[0].lon)
+              lat,
+              lng
             };
+
+            if (this.state.map) {
+              const radiusKm = this.state.filters.locationRadius || 10;
+              const zoom = this.getZoomLevelForRadius(radiusKm);
+              this.state.map.setView([lat, lng], zoom);
+              this.updateLocationCircle(lat, lng, radiusKm);
+            }
             Utils.showToast(`Filtrerar inom ${this.state.filters.locationRadius} km från ${results[0].display_name.split(',')[0]}`, 3000, 'success');
             this.applyFilters();
           } else {
@@ -3855,6 +4113,12 @@
             };
 
             document.getElementById('location-search').value = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
+            if (this.state.map) {
+              const radiusKm = this.state.filters.locationRadius || 10;
+              const zoom = this.getZoomLevelForRadius(radiusKm);
+              this.state.map.setView([position.coords.latitude, position.coords.longitude], zoom);
+              this.updateLocationCircle(position.coords.latitude, position.coords.longitude, radiusKm);
+            }
             Utils.showToast(`Filtrerar inom ${this.state.filters.locationRadius} km från din position`, 3000, 'success');
             this.applyFilters();
           },
@@ -3933,6 +4197,7 @@
         });
 
         Utils.showToast('Alla filter rensade', 2000, 'success');
+        this.clearLocationCircle();
         this.applyFilters();
       }
 

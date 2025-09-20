@@ -9,7 +9,8 @@ const DATA_CACHE_NAME = 'police-events-data-v1.2';
 // Static assets to cache
 const STATIC_ASSETS = [
   '/',
-  '/police-events-map-professional.html',
+  '/index.html',
+  '/js/enhanced-popup.js',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',
