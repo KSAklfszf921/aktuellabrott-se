@@ -2474,6 +2474,18 @@
         document.getElementById('stats-close').addEventListener('click',
           () => this.hideStats());
 
+        document.getElementById('favorites-toggle').addEventListener('click',
+          () => this.toggleFavorites());
+
+        document.getElementById('favorites-close').addEventListener('click',
+          () => this.hideFavorites());
+
+        document.getElementById('tab-events').addEventListener('click',
+          () => this.setFavoritesTab('events'));
+
+        document.getElementById('tab-locations').addEventListener('click',
+          () => this.setFavoritesTab('locations'));
+
         // Timeline controls
         document.getElementById('timeline-play').addEventListener('click',
           () => this.playTimeline());
@@ -3290,6 +3302,55 @@
 
         this.state.ui.timeline.playing = false;
         document.getElementById('timeline-play').textContent = 'Spela';
+      }
+
+      toggleFavorites() {
+        const panel = document.getElementById('favorites-panel');
+        if (!panel) return;
+
+        this.state.ui.favoritesVisible = !this.state.ui.favoritesVisible;
+        panel.style.display = this.state.ui.favoritesVisible ? 'flex' : 'none';
+
+        if (this.state.ui.favoritesVisible) {
+          this.setFavoritesTab(this.state.ui.favoritesActiveTab);
+        }
+      }
+
+      hideFavorites() {
+        const panel = document.getElementById('favorites-panel');
+        if (!panel) return;
+
+        this.state.ui.favoritesVisible = false;
+        panel.style.display = 'none';
+      }
+
+      setFavoritesTab(tab) {
+        if (!['events', 'locations'].includes(tab)) {
+          return;
+        }
+
+        this.state.ui.favoritesActiveTab = tab;
+
+        const eventsTab = document.getElementById('tab-events');
+        const locationsTab = document.getElementById('tab-locations');
+        const eventsContent = document.getElementById('favorites-events-content');
+        const locationsContent = document.getElementById('favorites-locations-content');
+
+        if (eventsTab) {
+          eventsTab.classList.toggle('active', tab === 'events');
+        }
+
+        if (locationsTab) {
+          locationsTab.classList.toggle('active', tab === 'locations');
+        }
+
+        if (eventsContent) {
+          eventsContent.style.display = tab === 'events' ? 'block' : 'none';
+        }
+
+        if (locationsContent) {
+          locationsContent.style.display = tab === 'locations' ? 'block' : 'none';
+        }
       }
 
       async refreshData() {
