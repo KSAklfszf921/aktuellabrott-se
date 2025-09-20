@@ -3,14 +3,17 @@
 
 'use strict';
 
-const CACHE_NAME = 'police-events-professional-v1.2';
-const DATA_CACHE_NAME = 'police-events-data-v1.2';
+const CACHE_NAME = 'police-events-professional-v2.0';
+const DATA_CACHE_NAME = 'police-events-data-v2.0';
 
 // Static assets to cache
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/offline.html',
+  '/js/app.js',
   '/js/enhanced-popup.js',
+  '/js/data-sync-manager.js',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css',
@@ -260,8 +263,19 @@ function createOfflineFallback(request) {
     });
   }
 
-  // For HTML requests, return offline page
+  // For HTML requests, try to serve offline.html from cache
   if (request.headers.get('accept').includes('text/html')) {
+    try {
+      const cache = await caches.open(CACHE_NAME);
+      const offlinePage = await cache.match('/offline.html');
+      if (offlinePage) {
+        return offlinePage;
+      }
+    } catch (error) {
+      console.warn('Could not serve offline page from cache:', error);
+    }
+
+    // Fallback to inline HTML if offline.html is not cached
     return new Response(createOfflineHTML(), {
       status: 200,
       statusText: 'OK (Offline)',
@@ -458,19 +472,43 @@ async function clearAllCaches() {
   }
 }
 
-// Background sync for failed API requests (if supported)
+// Enhanced Background sync for improved data management
 if ('sync' in self.registration) {
   self.addEventListener('sync', event => {
-    if (event.tag === 'background-sync-police-data') {
-      event.waitUntil(
-        syncPoliceData()
-          .then(() => {
-            console.log('[ServiceWorker] Background sync completed');
-          })
-          .catch(error => {
-            console.error('[ServiceWorker] Background sync failed:', error);
-          })
-      );
+    console.log('[ServiceWorker] Background sync triggered:', event.tag);
+
+    switch (event.tag) {
+      case 'background-sync-police-data':
+        event.waitUntil(
+          syncPoliceData()
+            .then(() => {
+              console.log('[ServiceWorker] Background sync completed successfully');
+              // Notify main app that new data is available
+              broadcastUpdate('background-sync-complete');
+            })
+            .catch(error => {
+              console.error('[ServiceWorker] Background sync failed:', error);
+              // Schedule retry
+              scheduleBackgroundSync('background-sync-police-data', 60000); // Retry in 1 minute
+            })
+        );
+        break;
+
+      case 'background-data-sync':
+        event.waitUntil(
+          performIntelligentSync()
+            .then(() => {
+              console.log('[ServiceWorker] Intelligent background sync completed');
+              broadcastUpdate('intelligent-sync-complete');
+            })
+            .catch(error => {
+              console.error('[ServiceWorker] Intelligent background sync failed:', error);
+            })
+        );
+        break;
+
+      default:
+        console.warn('[ServiceWorker] Unknown sync tag:', event.tag);
     }
   });
 }
@@ -542,4 +580,103 @@ async function cleanupExpiredCaches() {
   return cleanedCount;
 }
 
-console.log('[ServiceWorker] Professional Police Events Service Worker loaded');
+// Enhanced sync functions for improved data management
+async function performIntelligentSync() {
+  console.log('[ServiceWorker] Starting intelligent background sync...');
+
+  try {
+    // Check if we're on a metered connection
+    if ('connection' in navigator && navigator.connection.effectiveType === 'slow-2g') {
+      console.log('[ServiceWorker] Skipping sync on slow connection');
+      return;
+    }
+
+    // Sync in priority order
+    await syncPoliceData();
+
+    // Clear old data to manage storage
+    await cleanupExpiredCaches();
+
+    console.log('[ServiceWorker] Intelligent sync completed successfully');
+  } catch (error) {
+    console.error('[ServiceWorker] Intelligent sync failed:', error);
+    throw error;
+  }
+}
+
+// Broadcast updates to all clients
+function broadcastUpdate(type, data = {}) {
+  self.clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      client.postMessage({
+        type: 'SW_UPDATE',
+        payload: { type, data, timestamp: Date.now() }
+      });
+    });
+  });
+}
+
+// Schedule background sync with retry logic
+async function scheduleBackgroundSync(tag, delay = 0) {
+  try {
+    if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+      if (delay > 0) {
+        setTimeout(async () => {
+          const registration = await navigator.serviceWorker.ready;
+          await registration.sync.register(tag);
+        }, delay);
+      } else {
+        const registration = await navigator.serviceWorker.ready;
+        await registration.sync.register(tag);
+      }
+      console.log(`[ServiceWorker] Scheduled background sync: ${tag}`);
+    }
+  } catch (error) {
+    console.error('[ServiceWorker] Failed to schedule background sync:', error);
+  }
+}
+
+// Enhanced message handling for better communication with main app
+self.addEventListener('message', event => {
+  const { type, payload } = event.data;
+
+  console.log('[ServiceWorker] Message received:', type);
+
+  switch (type) {
+    case 'CACHE_STATS':
+      getCacheStats().then(stats => {
+        event.ports[0].postMessage({ type: 'CACHE_STATS_RESPONSE', payload: stats });
+      });
+      break;
+
+    case 'CLEAR_CACHE':
+      clearAllCaches().then(success => {
+        event.ports[0].postMessage({ type: 'CLEAR_CACHE_RESPONSE', payload: { success } });
+      });
+      break;
+
+    case 'FORCE_SYNC':
+      performIntelligentSync()
+        .then(() => {
+          event.ports[0].postMessage({ type: 'FORCE_SYNC_RESPONSE', payload: { success: true } });
+          broadcastUpdate('force-sync-complete');
+        })
+        .catch(error => {
+          event.ports[0].postMessage({ type: 'FORCE_SYNC_RESPONSE', payload: { success: false, error: error.message } });
+        });
+      break;
+
+    case 'SKIP_WAITING':
+      self.skipWaiting();
+      break;
+
+    case 'REQUEST_SYNC':
+      scheduleBackgroundSync(payload.tag || 'background-data-sync');
+      break;
+
+    default:
+      console.warn('[ServiceWorker] Unknown message type:', type);
+  }
+});
+
+console.log('[ServiceWorker] Professional Police Events Service Worker v2.0 loaded with enhanced sync capabilities');

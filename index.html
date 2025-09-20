@@ -12,52 +12,87 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
   <style>
-    /* Modern CSS Variables - Light Professional Theme */
+    /* Modern CSS Variables - Premium Dark/Light Theme */
     :root {
-      --color-primary: #475569;
-      --color-primary-light: #64748b;
-      --color-primary-dark: #334155;
-      --color-secondary: #78716c;
-      --color-secondary-light: #a8a29e;
-      --color-accent: #6b7280;
-      --color-warning: #a16207;
-      --color-error: #991b1b;
-      --color-success: #15803d;
+      /* Primary Brand Colors - Deep Blues */
+      --color-primary: #1e40af;
+      --color-primary-light: #3b82f6;
+      --color-primary-dark: #1e3a8a;
+      --color-primary-gradient: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
 
+      /* Secondary Colors - Sophisticated Grays */
+      --color-secondary: #374151;
+      --color-secondary-light: #6b7280;
+      --color-accent: #8b5cf6;
+      --color-accent-light: #a78bfa;
+
+      /* Semantic Colors */
+      --color-warning: #f59e0b;
+      --color-error: #ef4444;
+      --color-success: #10b981;
+
+      /* Premium Background System */
       --bg-primary: #ffffff;
       --bg-secondary: #f8fafc;
       --bg-tertiary: #f1f5f9;
-      --bg-overlay: rgba(255, 255, 255, 0.95);
-      --bg-glass: rgba(255, 255, 255, 0.8);
+      --bg-dark: #0f172a;
+      --bg-dark-secondary: #1e293b;
 
+      /* Glassmorphism & Modern Effects */
+      --bg-glass: rgba(255, 255, 255, 0.7);
+      --bg-glass-dark: rgba(15, 23, 42, 0.7);
+      --bg-overlay: rgba(255, 255, 255, 0.9);
+      --bg-overlay-dark: rgba(15, 23, 42, 0.9);
+      --bg-blur: blur(20px);
+
+      /* Gradient System */
+      --gradient-primary: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #8b5cf6 100%);
+      --gradient-secondary: linear-gradient(135deg, #374151 0%, #6b7280 100%);
+      --gradient-accent: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+      --gradient-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+
+      /* Typography */
       --text-primary: #0f172a;
       --text-secondary: #475569;
       --text-muted: #64748b;
       --text-inverse: #ffffff;
 
-      --border-light: #e2e8f0;
-      --border-medium: #cbd5e1;
-      --border-dark: #94a3b8;
+      /* Enhanced Border System */
+      --border-light: rgba(226, 232, 240, 0.8);
+      --border-medium: rgba(203, 213, 225, 0.8);
+      --border-dark: rgba(148, 163, 184, 0.8);
+      --border-accent: rgba(139, 92, 246, 0.3);
 
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      /* Premium Shadow System */
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
       --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+      --shadow-accent: 0 10px 15px -3px rgba(139, 92, 246, 0.2);
 
-      --radius-sm: 4px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
+      /* Enhanced Radius System */
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-2xl: 24px;
+      --radius-full: 9999px;
 
+      /* Spacing remains the same */
       --spacing-xs: 4px;
       --spacing-sm: 8px;
       --spacing-md: 16px;
       --spacing-lg: 24px;
       --spacing-xl: 32px;
+      --spacing-2xl: 48px;
 
-      --transition-fast: 0.15s ease-out;
-      --transition-normal: 0.25s ease-out;
-      --transition-slow: 0.4s ease-out;
+      /* Enhanced Transition System */
+      --transition-fast: 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+      --transition-normal: 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+      --transition-slow: 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+      --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     /* Reset & Base Styles */
@@ -70,11 +105,45 @@
       margin: 0;
       padding: 0;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-      background: var(--bg-secondary);
+      background: var(--gradient-bg);
       color: var(--text-primary);
       font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--gradient-bg);
+      z-index: -2;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 120%;
+      height: 120%;
+      background:
+        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+      33% { transform: translate(-20px, -30px) rotate(1deg); }
+      66% { transform: translate(20px, 30px) rotate(-1deg); }
     }
 
     /* Layout */
@@ -85,11 +154,12 @@
       position: relative;
     }
 
-    /* Header */
+    /* Header with Glassmorphism */
     header {
-      background: var(--bg-primary);
+      background: var(--bg-glass);
+      backdrop-filter: var(--bg-blur);
       border-bottom: 1px solid var(--border-light);
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-lg);
       padding: var(--spacing-md) var(--spacing-lg);
       position: sticky;
       top: 0;
@@ -110,18 +180,32 @@
     }
 
     h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.75rem;
+      font-weight: 800;
       color: var(--text-primary);
       margin: 0;
-      letter-spacing: -0.025em;
+      background: var(--gradient-primary);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 100%;
+      animation: shimmerText 3s ease-in-out infinite;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    @keyframes shimmerText {
+      0%, 100% { background-position: 200% center; }
+      50% { background-position: 0% center; }
     }
 
     .header-subtitle {
-      font-size: 0.875rem;
+      font-size: 0.95rem;
       color: var(--text-secondary);
-      margin: 0 0 var(--spacing-md);
-      font-weight: 400;
+      margin: var(--spacing-xs) 0 var(--spacing-lg);
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: 0.01em;
     }
 
     .status-indicator {
@@ -155,26 +239,60 @@
     }
 
     .control-group {
-      background: var(--bg-primary);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-md);
-      padding: var(--spacing-md);
-      box-shadow: var(--shadow-sm);
-      transition: box-shadow var(--transition-fast);
+      background: var(--bg-glass);
+      backdrop-filter: var(--bg-blur);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--border-radius-xl);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-glass), var(--shadow-md);
+      transition: all var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .control-group::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--gradient-primary);
+      opacity: 0.4;
     }
 
     .control-group:hover {
-      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-glass), var(--shadow-xl);
+      border-color: var(--color-primary-light);
+      background: var(--bg-glass-hover);
     }
 
     .control-label {
       display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
+      font-size: 0.8rem;
+      font-weight: 700;
       color: var(--text-secondary);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: var(--spacing-xs);
+      letter-spacing: 0.08em;
+      margin-bottom: var(--spacing-sm);
+      transition: all var(--transition-smooth);
+      position: relative;
+    }
+
+    .control-label::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      transition: width var(--transition-smooth);
+    }
+
+    .control-group:hover .control-label::after {
+      width: 30px;
     }
 
     /* Form Elements */
@@ -185,21 +303,43 @@
 
     input[type="text"],
     input[type="number"],
+    input[type="date"],
     select {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-sm);
-      background: var(--bg-primary);
+      padding: 12px 16px;
+      border: 1px solid var(--border-glass);
+      border-radius: var(--border-radius-lg);
+      background: var(--bg-glass);
+      backdrop-filter: var(--bg-blur);
       color: var(--text-primary);
-      transition: all var(--transition-fast);
+      transition: all var(--transition-smooth);
       outline: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-glass), var(--shadow-sm);
+    }
+
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
     }
 
     input:focus,
     select:focus {
       border-color: var(--color-primary-light);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      box-shadow: var(--shadow-glass), 0 0 0 3px rgba(59, 130, 246, 0.15), var(--shadow-lg);
+      background: var(--bg-glass-hover);
+      transform: translateY(-1px);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    select:hover {
+      border-color: var(--color-primary-light);
+      transform: translateY(-1px);
     }
 
     /* Buttons */
@@ -214,46 +354,71 @@
       align-items: center;
       justify-content: center;
       gap: var(--spacing-xs);
-      padding: 10px 16px;
-      border: 1px solid transparent;
-      border-radius: var(--radius-sm);
-      font-weight: 500;
+      padding: 12px 20px;
+      border: 1px solid var(--border-glass);
+      border-radius: var(--border-radius-lg);
+      font-weight: 600;
       text-decoration: none;
       cursor: pointer;
-      transition: all var(--transition-fast);
+      transition: all var(--transition-smooth);
       position: relative;
       overflow: hidden;
       white-space: nowrap;
+      backdrop-filter: var(--bg-blur);
+      font-size: 0.875rem;
+      letter-spacing: 0.025em;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left var(--transition-smooth);
+    }
+
+    button:hover::before {
+      left: 100%;
     }
 
     .btn-primary {
-      background: var(--color-primary);
+      background: var(--gradient-primary);
       color: var(--text-inverse);
-      border-color: var(--color-primary);
+      border-color: var(--color-primary-light);
+      box-shadow: var(--shadow-glass), var(--shadow-md);
     }
 
     .btn-primary:hover {
-      background: var(--color-primary-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-md);
+      background: var(--gradient-primary-hover);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: var(--shadow-glass), var(--shadow-xl);
+      border-color: var(--color-primary);
     }
 
     .btn-secondary {
-      background: var(--bg-primary);
-      color: var(--text-secondary);
-      border-color: var(--border-medium);
+      background: var(--bg-glass);
+      color: var(--text-primary);
+      border-color: var(--border-glass);
+      box-shadow: var(--shadow-glass), var(--shadow-sm);
     }
 
     .btn-secondary:hover {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      border-color: var(--border-dark);
+      background: var(--bg-glass-hover);
+      color: var(--color-primary);
+      border-color: var(--color-primary-light);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-glass), var(--shadow-lg);
     }
 
     .btn-secondary.active {
-      background: var(--color-primary);
+      background: var(--gradient-primary);
       color: var(--text-inverse);
       border-color: var(--color-primary);
+      box-shadow: var(--shadow-glass), var(--shadow-lg);
+      transform: translateY(-1px);
     }
 
     /* Map Container */
@@ -267,13 +432,32 @@
     /* Floating UI Elements */
     .floating-panel {
       position: absolute;
-      background: var(--bg-overlay);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
+      background: var(--bg-glass);
+      backdrop-filter: var(--bg-blur);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--border-radius-xl);
+      box-shadow: var(--shadow-glass), var(--shadow-xl);
       z-index: 500;
-      transition: all var(--transition-normal);
+      transition: all var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .floating-panel::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--gradient-primary);
+      opacity: 0.6;
+    }
+
+    .floating-panel:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glass), var(--shadow-2xl);
+      border-color: var(--color-primary-light);
     }
 
     /* Legend */
@@ -805,27 +989,53 @@
     }
 
     .fab {
-      width: 48px;
-      height: 48px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-light);
-      box-shadow: var(--shadow-md);
+      background: var(--bg-glass);
+      backdrop-filter: var(--bg-blur);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-glass), var(--shadow-lg);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all var(--transition-fast);
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: var(--text-secondary);
+      transition: all var(--transition-smooth);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fab::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, var(--color-primary-light), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-smooth);
+      animation: rotate 4s linear infinite;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fab:hover::before {
+      opacity: 0.15;
     }
 
     .fab:hover {
-      background: var(--color-primary);
+      background: var(--gradient-primary);
       color: var(--text-inverse);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: var(--shadow-glass), var(--shadow-2xl);
+      border-color: var(--color-primary);
     }
 
     /* Timeline Controls */
@@ -1034,12 +1244,167 @@
       50% { opacity: 0.85; }
     }
 
-    /* Custom Leaflet Popup Styling */
+    /* Enhanced Animations & Micro-interactions */
+    @keyframes slideInFromBottom {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInFromRight {
+      from {
+        transform: translateX(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInFromLeft {
+      from {
+        transform: translateX(-30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: var(--shadow-glass), 0 0 5px var(--color-primary-light);
+      }
+      50% {
+        box-shadow: var(--shadow-glass), 0 0 20px var(--color-primary-light), 0 0 30px var(--color-primary-light);
+      }
+    }
+
+    /* Apply animations to elements */
+    .control-group {
+      animation: slideInFromLeft 0.4s var(--transition-ease) forwards;
+    }
+
+    .control-group:nth-child(even) {
+      animation: slideInFromRight 0.4s var(--transition-ease) forwards;
+    }
+
+    .floating-panel {
+      animation: scaleIn 0.3s var(--transition-ease) forwards;
+    }
+
+    .legend {
+      animation: slideInFromBottom 0.4s var(--transition-ease) forwards;
+    }
+
+    .fab {
+      animation: scaleIn 0.3s var(--transition-ease) forwards;
+    }
+
+    .fab:nth-child(even) {
+      animation-delay: 0.1s;
+    }
+
+    .fab:nth-child(odd) {
+      animation-delay: 0.05s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    input:focus,
+    select:focus {
+      animation: glow 2s infinite;
+    }
+
+    /* Enhanced hover states */
+    .control-group:hover .control-label {
+      color: var(--color-primary);
+      transform: translateY(-1px);
+      transition: all var(--transition-smooth);
+    }
+
+    /* Loading shimmer effect */
+    .loading-shimmer {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-shimmer::after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+      content: '';
+    }
+
+    /* Staggered animations for lists */
+    .stagger-animation {
+      animation: slideInFromBottom 0.4s var(--transition-ease) forwards;
+    }
+
+    .stagger-animation:nth-child(1) { animation-delay: 0.1s; }
+    .stagger-animation:nth-child(2) { animation-delay: 0.2s; }
+    .stagger-animation:nth-child(3) { animation-delay: 0.3s; }
+    .stagger-animation:nth-child(4) { animation-delay: 0.4s; }
+    .stagger-animation:nth-child(5) { animation-delay: 0.5s; }
+
+    /* Custom Leaflet Popup Styling - Glassmorphism */
     .leaflet-popup-content-wrapper {
-      background: var(--bg-primary);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-xl);
-      border: 1px solid var(--border-light);
+      background: var(--bg-glass);
+      backdrop-filter: var(--bg-blur);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-glass), var(--shadow-xl);
+      border: 1px solid var(--border-glass);
+      animation: scaleIn 0.2s var(--transition-ease) forwards;
+    }
+
+    .leaflet-popup-content-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--gradient-primary);
+      border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+      opacity: 0.8;
     }
 
     .leaflet-popup-content {
@@ -1048,11 +1413,12 @@
       font-size: 0.875rem;
       line-height: 1.5;
       color: var(--text-primary);
+      position: relative;
     }
 
     .leaflet-popup-tip {
-      background: var(--bg-primary);
-      border: 1px solid var(--border-light);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
       border-top: none;
       border-right: none;
     }
@@ -1102,9 +1468,15 @@
             <h1>Polishändelser Sverige</h1>
             <p class="header-subtitle">Interaktiv realtidskarta med de senaste polishändelserna och alla polisstationer</p>
           </div>
-          <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span>Live-data</span>
+          <div style="display: flex; gap: var(--spacing-md); align-items: center;">
+            <div class="status-indicator">
+              <div class="status-dot"></div>
+              <span>Live-data</span>
+            </div>
+            <div class="sync-status-indicator" id="sync-status" style="display: flex; align-items: center; gap: var(--spacing-xs); font-size: 0.75rem; color: var(--text-muted);">
+              <div class="sync-dot" style="width: 6px; height: 6px; background: var(--color-primary); border-radius: 50%; animation: pulse 2s infinite;"></div>
+              <span>Synkroniserar...</span>
+            </div>
           </div>
         </div>
 
@@ -1395,6 +1767,7 @@
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="js/enhanced-popup.js"></script>
+  <script src="js/data-sync-manager.js"></script>
 
   <script>
     'use strict';
@@ -4219,9 +4592,44 @@
     }
 
     // ===== APPLICATION INITIALIZATION =====
-    document.addEventListener('DOMContentLoaded', () => {
-      // Initialize the application
-      window.policeEventsApp = new PoliceEventsApp();
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Initialize data sync manager first
+        console.log('🚀 Initializing Advanced Data Sync Manager...');
+        window.dataSyncManager = new DataSyncManager();
+
+        // Initialize the main application
+        console.log('🚀 Initializing Police Events App...');
+        window.policeEventsApp = new PoliceEventsApp();
+
+        // Set up event listeners for data sync integration
+        document.addEventListener('dataReady', (event) => {
+          console.log('📊 Data ready event received:', event.detail);
+          if (window.policeEventsApp && window.policeEventsApp.refreshDisplay) {
+            window.policeEventsApp.refreshDisplay();
+          }
+        });
+
+        document.addEventListener('dataUpdated', (event) => {
+          console.log('🔄 Data updated event received:', event.detail);
+          if (window.policeEventsApp && window.policeEventsApp.handleDataUpdate) {
+            window.policeEventsApp.handleDataUpdate(event.detail.type);
+          }
+        });
+
+        // Add force sync button handler
+        document.getElementById('refresh-data').addEventListener('click', async () => {
+          if (window.dataSyncManager) {
+            await window.dataSyncManager.forceSync();
+          }
+        });
+
+        console.log('✅ Application initialized successfully with advanced data sync!');
+
+      } catch (error) {
+        console.error('❌ Failed to initialize application:', error);
+        Utils.showToast('Kunde inte starta applikationen - ladda om sidan', 8000, 'error');
+      }
 
       // Global error handler
       window.addEventListener('error', (event) => {
@@ -4233,7 +4641,80 @@
       window.addEventListener('unhandledrejection', (event) => {
         console.error('Unhandled promise rejection:', event.reason);
         Utils.showToast('Ett fel uppstod vid datahantering', 4000, 'error');
+        event.preventDefault(); // Prevent console spam
       });
+
+      // Add sync status indicator
+      const addSyncStatusIndicator = () => {
+        const statusIndicator = document.querySelector('.status-indicator');
+        const syncStatusIndicator = document.getElementById('sync-status');
+
+        if (statusIndicator && syncStatusIndicator && window.dataSyncManager) {
+          const updateStatus = () => {
+            const stats = window.dataSyncManager.getSyncStats();
+            const statusText = statusIndicator.querySelector('span');
+            const statusDot = statusIndicator.querySelector('.status-dot');
+            const syncText = syncStatusIndicator.querySelector('span');
+            const syncDot = syncStatusIndicator.querySelector('.sync-dot');
+
+            // Update main connection status
+            if (stats.isOnline) {
+              statusText.textContent = `Ansluten • ${stats.mode} läge`;
+              statusDot.style.background = 'var(--color-success)';
+            } else {
+              statusText.textContent = 'Offline • Lokala data';
+              statusDot.style.background = 'var(--color-warning)';
+            }
+
+            // Update sync status
+            const lastSyncTimes = Object.values(stats.lastSyncTimestamps);
+            const mostRecentSync = Math.max(...lastSyncTimes.filter(t => t > 0));
+
+            if (mostRecentSync > 0) {
+              const minutesAgo = Math.floor((Date.now() - mostRecentSync) / 60000);
+              if (minutesAgo < 1) {
+                syncText.textContent = 'Precis synkad';
+                syncDot.style.background = 'var(--color-success)';
+                syncDot.style.animation = 'none';
+              } else if (minutesAgo < 5) {
+                syncText.textContent = `Synkad ${minutesAgo}m sedan`;
+                syncDot.style.background = 'var(--color-success)';
+                syncDot.style.animation = 'none';
+              } else if (minutesAgo < 30) {
+                syncText.textContent = `Synkad ${minutesAgo}m sedan`;
+                syncDot.style.background = 'var(--color-warning)';
+                syncDot.style.animation = 'pulse 2s infinite';
+              } else {
+                syncText.textContent = 'Gammal data';
+                syncDot.style.background = 'var(--color-error)';
+                syncDot.style.animation = 'pulse 1s infinite';
+              }
+            } else {
+              syncText.textContent = 'Synkroniserar...';
+              syncDot.style.background = 'var(--color-primary)';
+              syncDot.style.animation = 'pulse 1.5s infinite';
+            }
+          };
+
+          // Update immediately and then every 30 seconds
+          updateStatus();
+          const statusInterval = setInterval(updateStatus, 30000);
+
+          // Update on online/offline events
+          window.addEventListener('online', updateStatus);
+          window.addEventListener('offline', updateStatus);
+
+          // Update on data sync events
+          document.addEventListener('dataReady', updateStatus);
+          document.addEventListener('dataUpdated', updateStatus);
+
+          // Store interval for cleanup if needed
+          window.statusUpdateInterval = statusInterval;
+        }
+      };
+
+      // Add status indicator after a short delay to ensure DOM is ready
+      setTimeout(addSyncStatusIndicator, 1000);
     });
 
   </script>
