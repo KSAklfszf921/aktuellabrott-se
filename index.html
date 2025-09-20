@@ -1241,6 +1241,16 @@
     <button class="fab" id="fullscreen-toggle" aria-label="Fullskärm" title="Fullskärmsläge">
       ⛶
     </button>
+    <button
+      class="fab"
+      id="legend-toggle"
+      aria-label="Dölj legend"
+      aria-controls="legend"
+      aria-expanded="true"
+      title="Dölj legend"
+    >
+      ℹ️
+    </button>
     <button class="fab" id="stats-toggle" aria-label="Statistik" title="Visa statistik">
       📊
     </button>
@@ -1250,7 +1260,15 @@
   <div class="legend floating-panel" id="legend">
     <h3 class="legend-title">
       Översikt
-      <button class="btn-close" id="legend-close" aria-label="Stäng legend">×</button>
+      <button
+        class="btn-close"
+        id="legend-close"
+        aria-label="Stäng legend"
+        aria-controls="legend"
+        aria-expanded="true"
+      >
+        ×
+      </button>
     </h3>
     <div class="legend-stats" id="legend-stats">
       Laddar statistik...
@@ -2284,6 +2302,7 @@
           },
           ui: {
             loading: false,
+            legendVisible: true,
             statsVisible: false,
             timelineVisible: false,
             favoritesVisible: false,
@@ -2318,6 +2337,9 @@
 
           // Bind event listeners
           this.bindEventListeners();
+
+          // Ensure legend visibility controls are in sync with state
+          this.setLegendVisibility(this.state.ui.legendVisible);
 
           // Load initial data and show immediately
           await this.loadInitialData();
@@ -2463,6 +2485,17 @@
         // Floating action buttons
         document.getElementById('fullscreen-toggle').addEventListener('click',
           () => this.toggleFullscreen());
+
+        const legendToggle = document.getElementById('legend-toggle');
+        if (legendToggle) {
+          legendToggle.addEventListener('click', () => {
+            if (this.state.ui.legendVisible) {
+              this.hideLegend();
+            } else {
+              this.showLegend();
+            }
+          });
+        }
 
         document.getElementById('stats-toggle').addEventListener('click',
           () => this.toggleStats());
@@ -3344,8 +3377,35 @@
         document.getElementById('stats-panel').style.display = 'none';
       }
 
+      setLegendVisibility(isVisible) {
+        const legendEl = document.getElementById('legend');
+        if (!legendEl) return;
+
+        this.state.ui.legendVisible = isVisible;
+        legendEl.style.display = isVisible ? 'block' : 'none';
+        legendEl.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+
+        const toggleButton = document.getElementById('legend-toggle');
+        if (toggleButton) {
+          toggleButton.setAttribute('aria-expanded', isVisible ? 'true' : 'false');
+          toggleButton.setAttribute('aria-label', isVisible ? 'Dölj legend' : 'Visa legend');
+          toggleButton.title = isVisible ? 'Dölj legend' : 'Visa legend';
+          toggleButton.classList.toggle('active', isVisible);
+        }
+
+        const closeButton = document.getElementById('legend-close');
+        if (closeButton) {
+          closeButton.setAttribute('aria-expanded', isVisible ? 'true' : 'false');
+        }
+      }
+
+      showLegend() {
+        this.setLegendVisibility(true);
+        this.updateLegend();
+      }
+
       hideLegend() {
-        document.getElementById('legend').style.display = 'none';
+        this.setLegendVisibility(false);
       }
 
       handleKeyboardShortcuts(event) {
