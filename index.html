@@ -2285,6 +2285,7 @@
       constructor() {
         this.state = {
           events: [],
+          allEvents: [],
           filteredEvents: [],
           stations: [],
           currentView: 'markers', // 'markers' | 'heatmap'
@@ -2579,9 +2580,11 @@
           // Try to load cached events first
           const cachedEvents = await DataStorage.getRecentEvents();
 
+          let rehydratedCachedEvents = [];
+
           if (cachedEvents.length > 0) {
             // Recreate event objects from cached data
-            this.state.events = cachedEvents.map(data => {
+            rehydratedCachedEvents = cachedEvents.map(data => {
               const event = Object.create(PoliceEvent.prototype);
               Object.assign(event, data);
 
@@ -2621,6 +2624,10 @@
               return event;
             });
 
+            this.state.events = rehydratedCachedEvents;
+
+            this.state.allEvents = [...this.state.events];
+
             // Immediately show cached events on map
             this.applyFilters();
             this.updateEventTypeSelect();
@@ -2640,22 +2647,22 @@
           const events = rawEvents
             .map(raw => new PoliceEvent(raw))
             .filter(event => event.isValidEvent())
-            .sort((a, b) => b.timeMs - a.timeMs)
-            .slice(0, this.state.maxEvents);
+            .sort((a, b) => b.timeMs - a.timeMs);
 
           // Merge with cached events and deduplicate
           const eventMap = new Map();
 
           // Add cached events first
-          cachedEvents.forEach(event => eventMap.set(event.id, event));
+          rehydratedCachedEvents.forEach(event => eventMap.set(event.id, event));
 
           // Add fresh events (will overwrite cached events with same ID)
           events.forEach(event => eventMap.set(event.id, event));
 
           // Convert back to array and sort
-          this.state.events = Array.from(eventMap.values())
-            .sort((a, b) => b.timeMs - a.timeMs)
-            .slice(0, this.state.maxEvents);
+          this.state.allEvents = Array.from(eventMap.values())
+            .sort((a, b) => b.timeMs - a.timeMs);
+
+          this.state.events = this.state.allEvents.slice(0, this.state.maxEvents);
 
           // Cache new events
           await DataStorage.saveEvents(events);
@@ -2833,8 +2840,8 @@
         input.value = value;
         this.state.maxEvents = value;
 
-        // Re-slice events to new limit
-        this.state.events = this.state.events.slice(0, value);
+        // Re-slice events from full dataset
+        this.state.events = this.state.allEvents.slice(0, value);
         this.applyFilters();
       }
 
