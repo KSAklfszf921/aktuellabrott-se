@@ -1614,43 +1614,65 @@
     class CrimeSeveritySystem {
       static SEVERITY_MAPPING = {
         // Level 1 - Minor offenses (Muted Green)
-        'Trafikbrott': { level: 1, color: '#6b7280', description: 'Trafikbrott' },
-        'Fortkörning': { level: 1, color: '#6b7280', description: 'Fortkörning' },
-        'Parkering': { level: 1, color: '#6b7280', description: 'Parkeringsbrott' },
-        'Ordningslagen': { level: 1, color: '#6b7280', description: 'Ordningslagen' },
+        'Trafikbrott': { level: 1, color: '#6b7280', description: 'Trafikbrott', priority: 'low' },
+        'Fortkörning': { level: 1, color: '#6b7280', description: 'Fortkörning', priority: 'low' },
+        'Parkering': { level: 1, color: '#6b7280', description: 'Parkeringsbrott', priority: 'low' },
+        'Ordningslagen': { level: 1, color: '#6b7280', description: 'Ordningslagen', priority: 'low' },
 
         // Level 2 - Property crimes (Muted Yellow-Orange)
-        'Skadegörelse': { level: 2, color: '#a16207', description: 'Skadegörelse' },
-        'Stöld': { level: 2, color: '#92400e', description: 'Stöld' },
-        'Snatteri': { level: 2, color: '#92400e', description: 'Snatteri' },
-        'Bedrägeri': { level: 2, color: '#92400e', description: 'Bedrägeri' },
-        'Inbrott': { level: 2, color: '#78350f', description: 'Inbrott' },
+        'Skadegörelse': { level: 2, color: '#a16207', description: 'Skadegörelse', priority: 'medium' },
+        'Stöld': { level: 2, color: '#92400e', description: 'Stöld', priority: 'medium' },
+        'Snatteri': { level: 2, color: '#92400e', description: 'Snatteri', priority: 'medium' },
+        'Bedrägeri': { level: 2, color: '#92400e', description: 'Bedrägeri', priority: 'medium' },
+        'Inbrott': { level: 2, color: '#78350f', description: 'Inbrott', priority: 'medium' },
 
         // Level 3 - Drug crimes and serious property crimes (Muted Orange-Red)
-        'Narkotikabrott': { level: 3, color: '#a16207', description: 'Narkotikabrott' },
-        'Rattfylleri': { level: 3, color: '#a16207', description: 'Rattfylleri' },
-        'Rån': { level: 3, color: '#92400e', description: 'Rån' },
+        'Narkotikabrott': { level: 3, color: '#a16207', description: 'Narkotikabrott', priority: 'high' },
+        'Rattfylleri': { level: 3, color: '#a16207', description: 'Rattfylleri', priority: 'high' },
+        'Rån': { level: 3, color: '#92400e', description: 'Rån', priority: 'high' },
 
         // Level 4 - Violent crimes (Muted Red)
-        'Misshandel': { level: 4, color: '#7c2d12', description: 'Misshandel' },
-        'Våldtäkt': { level: 4, color: '#7c2d12', description: 'Våldtäkt' },
-        'Våld mot tjänsteman': { level: 4, color: '#7c2d12', description: 'Våld mot tjänsteman' },
-        'Olaga hot': { level: 4, color: '#7c2d12', description: 'Olaga hot' },
+        'Misshandel': { level: 4, color: '#7c2d12', description: 'Misshandel', priority: 'critical' },
+        'Våldtäkt': { level: 4, color: '#7c2d12', description: 'Våldtäkt', priority: 'critical' },
+        'Våld mot tjänsteman': { level: 4, color: '#7c2d12', description: 'Våld mot tjänsteman', priority: 'critical' },
+        'Olaga hot': { level: 4, color: '#7c2d12', description: 'Olaga hot', priority: 'critical' },
 
         // Level 5 - Most serious crimes (Dark Muted Red)
-        'Mord': { level: 5, color: '#78716c', description: 'Mord' },
-        'Dråp': { level: 5, color: '#78716c', description: 'Dråp' },
-        'Mordbrand': { level: 5, color: '#78716c', description: 'Mordbrand' },
-        'Brand': { level: 4, color: '#7c2d12', description: 'Brand' },
+        'Mord': { level: 5, color: '#78716c', description: 'Mord', priority: 'critical' },
+        'Dråp': { level: 5, color: '#78716c', description: 'Dråp', priority: 'critical' },
+        'Mordbrand': { level: 5, color: '#78716c', description: 'Mordbrand', priority: 'critical' },
+        'Brand': { level: 4, color: '#7c2d12', description: 'Brand', priority: 'critical' },
 
         // Default
-        'Övrigt': { level: 2, color: '#6b7280', description: 'Övrigt' }
+        'Övrigt': { level: 2, color: '#6b7280', description: 'Övrigt', priority: 'medium' }
       };
 
+      static getPriorityForLevel(level) {
+        if (typeof level !== 'number') return 'medium';
+        if (level >= 4) return 'critical';
+        if (level === 3) return 'high';
+        if (level === 2) return 'medium';
+        return 'low';
+      }
+
+      static ensurePriority(info = this.SEVERITY_MAPPING['Övrigt']) {
+        const baseInfo = info || this.SEVERITY_MAPPING['Övrigt'];
+        const priority = baseInfo.priority ?? this.getPriorityForLevel(baseInfo.level);
+
+        return {
+          ...baseInfo,
+          priority
+        };
+      }
+
       static getSeverityInfo(crimeType) {
+        if (!crimeType || typeof crimeType !== 'string') {
+          return this.ensurePriority();
+        }
+
         // Direct match
         if (this.SEVERITY_MAPPING[crimeType]) {
-          return this.SEVERITY_MAPPING[crimeType];
+          return this.ensurePriority(this.SEVERITY_MAPPING[crimeType]);
         }
 
         // Fuzzy matching for similar crime types
@@ -1658,7 +1680,7 @@
 
         for (const [key, value] of Object.entries(this.SEVERITY_MAPPING)) {
           if (lowerType.includes(key.toLowerCase()) || key.toLowerCase().includes(lowerType)) {
-            return value;
+            return this.ensurePriority(value);
           }
         }
 
@@ -1676,12 +1698,12 @@
 
         for (const [keyword, severity] of Object.entries(crimeKeywords)) {
           if (lowerType.includes(keyword)) {
-            return severity;
+            return this.ensurePriority(severity);
           }
         }
 
         // Default fallback
-        return this.SEVERITY_MAPPING['Övrigt'];
+        return this.ensurePriority();
       }
 
       static getSeverityColor(crimeType) {
@@ -2123,6 +2145,7 @@
           transaction.oncomplete = () => resolve();
 
           events.forEach(event => {
+            const severityInfo = CrimeSeveritySystem.ensurePriority(event.severityInfo);
             const eventData = {
               id: event.id,
               timeMs: event.timeMs,
@@ -2135,7 +2158,7 @@
               lat: event.lat,
               lng: event.lng,
               exactLocation: event.exactLocation,
-              severityInfo: event.severityInfo,
+              severityInfo: { ...severityInfo },
               url: event.url
             };
             store.put(eventData);
