@@ -2548,7 +2548,42 @@
             // Recreate event objects from cached data
             this.state.events = cachedEvents.map(data => {
               const event = Object.create(PoliceEvent.prototype);
-              return Object.assign(event, data);
+              Object.assign(event, data);
+
+              if (!(event.timestamp instanceof Date)) {
+                event.timestamp = event.timestamp ? new Date(event.timestamp) : new Date(event.timeMs || Date.now());
+              }
+
+              if (typeof event.timeMs !== 'number') {
+                event.timeMs = event.timestamp ? event.timestamp.getTime() : Date.now();
+              }
+
+              if (typeof event.lat === 'string') {
+                event.lat = parseFloat(event.lat);
+              }
+
+              if (typeof event.lng === 'string') {
+                event.lng = parseFloat(event.lng);
+              }
+
+              if (!event.severityInfo) {
+                event.severityInfo = CrimeSeveritySystem.getSeverityInfo(event.type);
+              }
+
+              event.rawData = event.rawData || {
+                id: event.id,
+                datetime: event.timestamp instanceof Date ? event.timestamp.toISOString() : event.timestamp,
+                name: event.title,
+                summary: event.description,
+                url: event.url,
+                type: event.type,
+                location: {
+                  name: event.city,
+                  gps: Number.isFinite(event.lat) && Number.isFinite(event.lng) ? `${event.lat},${event.lng}` : null
+                }
+              };
+
+              return event;
             });
 
             // Immediately show cached events on map
@@ -2913,9 +2948,15 @@
             zIndexOffset: 1000 // Above police stations
           });
 
-          marker.bindPopup(event.getPopupContent(), {
+          marker.bindPopup(EnhancedEventPopup.generatePopupContent(event), {
             maxWidth: 320,
             className: 'crime-event-popup'
+          });
+
+          marker.on('popupopen', (popupEvent) => {
+            if (window.EnhancedEventPopup && typeof EnhancedEventPopup.attachPopupActions === 'function') {
+              EnhancedEventPopup.attachPopupActions(popupEvent.popup, event);
+            }
           });
 
           this.state.layers.eventCluster.addLayer(marker);
