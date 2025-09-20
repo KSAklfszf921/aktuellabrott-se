@@ -2280,7 +2280,8 @@
           layers: {
             eventCluster: null,
             stationCluster: null,
-            heatLayer: null
+            heatLayer: null,
+            locationCircle: null
           },
           ui: {
             loading: false,
@@ -3451,6 +3452,45 @@
         this.applyFilters();
       }
 
+      getZoomLevelForRadius(radiusKm) {
+        const numericRadius = typeof radiusKm === 'number' ? radiusKm : parseFloat(radiusKm);
+        const radius = Number.isFinite(numericRadius) ? numericRadius : 10;
+        if (radius <= 5) return 12;
+        if (radius <= 10) return 11;
+        if (radius <= 25) return 10;
+        if (radius <= 50) return 9;
+        if (radius <= 100) return 8;
+        return 7;
+      }
+
+      updateLocationCircle(lat, lng, radiusKm) {
+        if (!this.state.map) return;
+
+        const numericRadius = typeof radiusKm === 'number' ? radiusKm : parseFloat(radiusKm);
+        const safeRadiusKm = Number.isFinite(numericRadius) ? numericRadius : 0;
+        const radiusMeters = Math.max(0, safeRadiusKm) * 1000;
+
+        if (this.state.layers.locationCircle) {
+          this.state.layers.locationCircle.setLatLng([lat, lng]);
+          this.state.layers.locationCircle.setRadius(radiusMeters);
+        } else {
+          this.state.layers.locationCircle = L.circle([lat, lng], {
+            radius: radiusMeters,
+            color: '#2563eb',
+            weight: 2,
+            fillColor: '#2563eb',
+            fillOpacity: 0.15
+          }).addTo(this.state.map);
+        }
+      }
+
+      clearLocationCircle() {
+        if (this.state.layers.locationCircle && this.state.map) {
+          this.state.map.removeLayer(this.state.layers.locationCircle);
+        }
+        this.state.layers.locationCircle = null;
+      }
+
       updateLocationFilter() {
         const locationQuery = document.getElementById('location-search').value.trim();
         this.state.filters.locationRadius = parseInt(document.getElementById('distance-radius').value);
@@ -3459,6 +3499,7 @@
           this.geocodeLocation(locationQuery);
         } else {
           this.state.filters.locationCenter = null;
+          this.clearLocationCircle();
           this.applyFilters();
         }
       }
@@ -3474,10 +3515,19 @@
           const results = await response.json();
 
           if (results.length > 0) {
+            const lat = parseFloat(results[0].lat);
+            const lng = parseFloat(results[0].lon);
             this.state.filters.locationCenter = {
-              lat: parseFloat(results[0].lat),
-              lng: parseFloat(results[0].lon)
+              lat,
+              lng
             };
+
+            if (this.state.map) {
+              const radiusKm = this.state.filters.locationRadius || 10;
+              const zoom = this.getZoomLevelForRadius(radiusKm);
+              this.state.map.setView([lat, lng], zoom);
+              this.updateLocationCircle(lat, lng, radiusKm);
+            }
             Utils.showToast(`Filtrerar inom ${this.state.filters.locationRadius} km från ${results[0].display_name.split(',')[0]}`, 3000, 'success');
             this.applyFilters();
           } else {
@@ -3505,6 +3555,12 @@
             };
 
             document.getElementById('location-search').value = `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`;
+            if (this.state.map) {
+              const radiusKm = this.state.filters.locationRadius || 10;
+              const zoom = this.getZoomLevelForRadius(radiusKm);
+              this.state.map.setView([position.coords.latitude, position.coords.longitude], zoom);
+              this.updateLocationCircle(position.coords.latitude, position.coords.longitude, radiusKm);
+            }
             Utils.showToast(`Filtrerar inom ${this.state.filters.locationRadius} km från din position`, 3000, 'success');
             this.applyFilters();
           },
@@ -3583,6 +3639,7 @@
         });
 
         Utils.showToast('Alla filter rensade', 2000, 'success');
+        this.clearLocationCircle();
         this.applyFilters();
       }
 
